@@ -22,6 +22,7 @@
 #include "notify.h"
 #include "prefs.h"
 #include "signals.h"
+#include "version.h"
 
 #include "gtkblist.h"
 #include "gtkconv.h"
@@ -52,6 +53,7 @@ static const char *pref_popup_size       = "/plugins/gtk/kstange/extendedprefs/p
 static const char *pref_conv_size        = "/plugins/gtk/kstange/extendedprefs/conv_size";
 static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/log_size";
 static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
+static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
 
 static void
 spin_pref_set_int(GtkWidget *w, void *data) {
@@ -322,16 +324,49 @@ blist_taskbar_set(GtkWidget *w) {
 	blist_taskbar_update();
 }
 
+static void
+blist_shrink_update() {
+	GaimBuddyList *blist = gaim_get_blist();
+
+	if (blist) {
+		GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(blist);
+
+		if (!GTK_IS_WINDOW(gtkblist->window))
+			return;
+
+		GTK_WINDOW(gtkblist->window)->allow_shrink =
+			gaim_prefs_get_bool(pref_blist_allow_shrink);
+
+	}
+}
+
+static void
+blist_shrink_set(GtkWidget *w) {
+	gaim_prefs_set_bool(pref_blist_allow_shrink,
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)));
+	blist_shrink_update();
+}
+
+static void
+blist_created_cb(GaimBuddyList *blist, void *data) {
+	blist_taskbar_update();
+	blist_shrink_update();
+}
+
 gboolean plugin_load(GaimPlugin *plugin) {
+	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
+
 	gaim_signal_connect((void*)gaim_conversations_get_handle(),
 						"conversation-created", plugin,
 						GAIM_CALLBACK(conv_prefs_init), NULL);
 
-	gaim_signal_connect((void*)gaim_connections_get_handle(),
-						"signed-on", plugin,
-						GAIM_CALLBACK(blist_taskbar_update), NULL);
+	/** depending when the plugin is loaded, the blist may or may not have been created **/
+	if (gtkblist != NULL && GTK_IS_WINDOW(gtkblist->window)) {
+		blist_created_cb(gaim_get_blist(), NULL);
+	} else {
+		gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), NULL);
+	}
 
-	blist_taskbar_update();
 	conv_prefs_init_all();
 	size_prefs_init_all();
 
@@ -339,14 +374,14 @@ gboolean plugin_load(GaimPlugin *plugin) {
 }
 
 gboolean plugin_unload(GaimPlugin *plugin) {
-	GaimBuddyList *blist = gaim_get_blist();
-	GaimGtkBuddyList *gtkblist;
+	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
 
-	if (blist) {
+	if (gtkblist != NULL && GTK_IS_WINDOW(gtkblist->window)) {
 		/* FIXME: In Win32, the taskbar entry won't come back till the window
 		   is focused. */
-	  	gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(gtkblist->window), FALSE);
+	
+		GTK_WINDOW(gtkblist->window)->allow_shrink = FALSE;
 	}
 
 	conv_prefs_clear_all();
@@ -498,6 +533,11 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_taskbar_set), NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
 
+	button = gtk_check_button_new_with_mnemonic("Allow buddy list to s_hrink");
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_blist_allow_shrink));
+	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_shrink_set), NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	
 	gtk_widget_show_all(ret);
 	return ret;
 }
@@ -509,7 +549,9 @@ static GaimGtkPluginUiInfo ui_info =
 
 static GaimPluginInfo info =
 {
-	GAIM_PLUGIN_API_VERSION,
+	GAIM_PLUGIN_MAGIC,
+	GAIM_MAJOR_VERSION,
+	GAIM_MINOR_VERSION,
 	GAIM_PLUGIN_STANDARD,
 	GAIM_GTK_PLUGIN_TYPE,
 	0,
@@ -548,6 +590,7 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_int(pref_popup_size, 8);
 	gaim_prefs_add_int(pref_log_size, 8);
 	gaim_prefs_add_int(pref_blist_size, 8);
+	gaim_prefs_add_bool(pref_blist_allow_shrink, FALSE);
 
 	if (gaim_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * gaim_prefs_get_int(pref_conv_zoom);
