@@ -54,7 +54,7 @@ install: all
 	cp $(EP).so $(LIB_INSTALL_DIR)
 
 $(EP).so: $(EP).c
-	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c $< -o tmp$@.lo $(GAIM_CFLAGS) $(GTK_CFLAGS) -DHAVE_CONFIG_H
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c $< -o tmp$@.lo $(GAIM_CFLAGS) $(GTK_CFLAGS) -DHAVE_CONFIG_H $(DEFINES)
 	$(LIBTOOL) --mode=link    $(CC) $(CFLAGS) -o libtmp$@.la -rpath $(GAIM_LIBDIR) tmp$@.lo $(GAIM_LIBS) $(GTK_LIBS) -module -avoid-version
 	rm -f tmp$@.lo tmp$@.o libtmp$@.la
 	cp .libs/libtmp$@.so* $@
