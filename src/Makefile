@@ -30,7 +30,7 @@ endif
 EP_TOP =		../
 
 EP = extendedprefs
-EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
+EP_VERSION = $(shell cat $(EP_TOP)/VERSION)
 
 GAIM_CFLAGS  = $(shell pkg-config gaim --cflags)
 GTK_CFLAGS   = $(shell pkg-config gtk+-2.0 --cflags)
@@ -43,8 +43,6 @@ EP_SRC =	extendedprefs.c
 SOURCE_DIST = 	Makefile \
 				Makefile.mingw
 
-DEFINES = -DEP_VERSION=\"$(EP_VERSION)\"
-
 .PHONY: all clean install
 
 all: $(EP).so
@@ -54,7 +52,7 @@ install: all
 	cp $(EP).so $(LIB_INSTALL_DIR)
 
 $(EP).so: $(EP).c
-	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c $< -o tmp$@.lo $(GAIM_CFLAGS) $(GTK_CFLAGS) -DHAVE_CONFIG_H $(DEFINES)
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c $< -o tmp$@.lo $(GAIM_CFLAGS) $(GTK_CFLAGS) -DHAVE_CONFIG_H -DEP_VERSION=\\\"$(EP_VERSION)\\\"
 	$(LIBTOOL) --mode=link    $(CC) $(CFLAGS) -o libtmp$@.la -rpath $(GAIM_LIBDIR) tmp$@.lo $(GAIM_LIBS) $(GTK_LIBS) -module -avoid-version
 	rm -f tmp$@.lo tmp$@.o libtmp$@.la
 	cp .libs/libtmp$@.so* $@
