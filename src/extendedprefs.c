@@ -36,22 +36,22 @@
 #define KSTANGE_EP_BLIST_TIP_MIN 0
 #define KSTANGE_EP_BLIST_TIP_MAX 7000
 
-static const char *pref_conv_zoom     = "/plugins/gtk/kstange/extendedprefs/conv_zoom";
+static const char *pref_conv_zoom        = "/plugins/gtk/kstange/extendedprefs/conv_zoom";
 
-static const char *pref_blist_taskbar = "/plugins/gtk/kstange/extendedprefs/blist_taskbar";
+static const char *pref_blist_taskbar    = "/plugins/gtk/kstange/extendedprefs/blist_taskbar";
 
-static const char *pref_tooltip_delay = "/gaim/gtk/blist/tooltip_delay";
+static const char *pref_tooltip_delay    = "/gaim/gtk/blist/tooltip_delay";
 
-static const char *pref_conv_show_warn  = "/plugins/gtk/kstange/extendedprefs/conv_buttons/warn";
+static const char *pref_conv_show_warn   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/warn";
 static const char *pref_conv_show_block  = "/plugins/gtk/kstange/extendedprefs/conv_buttons/block";
 static const char *pref_conv_show_file   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/file";
 static const char *pref_conv_show_add    = "/plugins/gtk/kstange/extendedprefs/conv_buttons/add";
 static const char *pref_conv_show_info   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/info";
 static const char *pref_conv_show_invite = "/plugins/gtk/kstange/extendedprefs/conv_buttons/invite";
-static const char *pref_popup_size     = "/plugins/gtk/kstange/extendedprefs/popup_size";
-static const char *pref_conv_size     = "/plugins/gtk/kstange/extendedprefs/conv_size";
-static const char *pref_log_size     = "/plugins/gtk/kstange/extendedprefs/log_size";
-static const char *pref_blist_size     = "/plugins/gtk/kstange/extendedprefs/blist_size";
+static const char *pref_popup_size       = "/plugins/gtk/kstange/extendedprefs/popup_size";
+static const char *pref_conv_size        = "/plugins/gtk/kstange/extendedprefs/conv_size";
+static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/log_size";
+static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
 
 static void
 spin_pref_set_int(GtkWidget *w, void *data) {
