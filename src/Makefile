@@ -21,7 +21,7 @@
 CC := gcc
 LIBTOOL := libtool
 
-ifeq ($(PREFIX),)
+ifeq "$(PREFIX)" ""
   LIB_INSTALL_DIR = $(HOME)/.gaim/plugins
 else
   LIB_INSTALL_DIR = $(PREFIX)/lib/gaim
