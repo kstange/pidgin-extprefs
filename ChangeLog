@@ -1,5 +1,10 @@
 Gaim Extended Preferences Plugin
 
+Version 0.3cvs:
+	* Cleaned up the Makefiles further. Making clean will now remove older
+	  zip and tarballs. The Win32 MinGW detection should also be better,
+	  eliminating a dependency on sed.
+
 Version 0.2-r1 (08/21/2004):
 	* Fixed the linux Makefile so that when the plugin compiles perfectly
 	  it is also able to be loaded by Gaim and installs by default to a

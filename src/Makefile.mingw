@@ -76,7 +76,6 @@ PLUGIN_LIBS = \
 .PHONY: all clean install
 
 all: $(EP).dll
-	echo $(PREFIX)
 
 install: all
 	mkdir -p "$(DLL_INSTALL_DIR)"

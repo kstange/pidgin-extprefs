@@ -30,14 +30,22 @@ SOURCE_DIST = 	INSTALL \
 
 # This is a little on the hacky side, but it should probably guess properly
 # if the user is compiling using mingw gcc....
-MF_EXT = $(shell which gcc | sed "s+.*/minGW/.*+.mingw+" | grep -e mingw)
+ifneq ("$(shell $(CC) -v 2>&1 | grep "mingw special")","")
+  MF_EXT = .mingw
+  BUILD_TYPE = Windows Gaim
+else
+  MF_EXT =
+  BUILD_TYPE = Linux or Other Gaim
+endif
 
 EP_VERSION = $(shell cat ./VERSION)
 
 all:
+	@echo Building for $(BUILD_TYPE)...
 	$(MAKE) -C $(EP_SRC) -f Makefile$(MF_EXT)
 
 install: all
+	@echo Installing for $(BUILD_TYPE)...
 	$(MAKE) -C $(EP_SRC) -f Makefile$(MF_EXT) install
 
 zip: all
@@ -54,5 +62,5 @@ dist:
 
 clean:
 	$(MAKE) -C $(EP_SRC) -f Makefile$(MF_EXT) clean
-	rm -f extendedprefs-$(EP_VERSION).zip
-	rm -f extendedprefs-$(EP_VERSION).tar.gz
+	rm -f extendedprefs-*.zip
+	rm -f extendedprefs-*.tar.gz
