@@ -30,7 +30,7 @@ SOURCE_DIST = 	INSTALL \
 
 # This is a little on the hacky side, but it should probably guess properly
 # if the user is compiling using mingw gcc....
-ifneq "$(shell $(CC) -v 2>&1 | grep 'mingw special')" ""
+ifneq "$(shell $(CC) -v 2>&1 | grep -e 'mingw[ -]special')" ""
   MF_EXT = .mingw
   BUILD_TYPE = MinGW/Windows Gaim
 else

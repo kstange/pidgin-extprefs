@@ -333,8 +333,8 @@ static void
 blist_created_cb(GaimBuddyList *blist, void *data) {
 	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(blist);
 
-	blist_taskbar_update(NULL, 0, NULL, NULL);
-	blist_shrink_update(NULL, 0, NULL, NULL);
+	blist_taskbar_update(NULL, 0, (gpointer)gaim_prefs_get_bool(pref_blist_taskbar), NULL);
+	blist_shrink_update(NULL, 0, (gpointer)gaim_prefs_get_bool(pref_blist_allow_shrink), NULL);
 
 	if (gaim_prefs_get_bool(pref_blist_autohide) && (gboolean)data == TRUE) {
 		gtk_widget_hide(gtkblist->window);
@@ -412,8 +412,6 @@ gboolean plugin_unload(GaimPlugin *plugin) {
 
 		GTK_WINDOW(gtkblist->window)->allow_shrink = FALSE;
 	}
-
-	g_list_foreach(pref_callbacks, (GFunc)gaim_prefs_disconnect_callback, NULL);
 
 	conv_prefs_clear_all();
 	size_prefs_clear_all();
