@@ -55,7 +55,6 @@ static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/l
 static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
 static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
-static const char *pref_blist_hidden     = "/plugins/gtk/kstange/extendedprefs/blist_hidden";
 
 static GList *pref_callbacks;
 
@@ -349,8 +348,6 @@ blist_created_cb(GaimBuddyList *blist, void *data) {
 static void
 blist_signon_check_cb(GaimConnection *gc, void *data)
 {
-	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
-
 	if (gaim_connections_get_connecting() == NULL)
 		logging_in = FALSE;
 }
@@ -569,7 +566,6 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_bool(pref_blist_taskbar, TRUE);
 	gaim_prefs_add_bool(pref_blist_allow_shrink, FALSE);
 	gaim_prefs_add_bool(pref_blist_autohide, FALSE);
-	gaim_prefs_add_bool(pref_blist_hidden, FALSE);
 
 	if (gaim_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * gaim_prefs_get_int(pref_conv_zoom);
