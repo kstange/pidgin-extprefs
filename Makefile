@@ -32,10 +32,10 @@ SOURCE_DIST = 	INSTALL \
 # if the user is compiling using mingw gcc....
 ifneq "$(shell $(CC) -v 2>&1 | grep 'mingw special')" ""
   MF_EXT = .mingw
-  BUILD_TYPE = Windows (MinGW) Gaim
+  BUILD_TYPE = MinGW/Windows Gaim
 else
   MF_EXT =
-  BUILD_TYPE = Non-MinGW (Linux/Unix/Cygwin) Gaim
+  BUILD_TYPE = Non-MinGW/Linux/Unix Gaim
 endif
 
 EP_VERSION = $(shell cat ./VERSION)
