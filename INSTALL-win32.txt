@@ -2,8 +2,8 @@ Gaim Extended Preferences Plugin Installation
 ==========================================================
 
 To use this plugin with your regular Gaim installation, extract and copy
-the extendedprefs.dll file from the zip file directory to your Gaim user
-plugins directory:
+the extendedprefs.dll file from the zip file to your Gaim user plugins
+directory:
 
 	Windows 95/98/Me:
 	c:\windows\Application Data\.gaim\plugins (default user)

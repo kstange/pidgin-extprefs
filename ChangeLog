@@ -1,6 +1,6 @@
 Gaim Extended Preferences Plugin
 
-Version 0.3cvs:
+Version 0.3 (09/16/2004):
 	* Gaim 1.x.x binary and source compatibility.
 	* Added the option to allow the buddy list to be resized below the
 	  usual minimum dimensions. (Daniel Attallah)

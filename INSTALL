@@ -34,7 +34,8 @@ the prefix value.  For example, if you want to install the plugin to
 
 	PREFIX="/usr/local" make install
 
-Then simply start or restart Gaim and load the plugin.
+Then simply start or restart Gaim and load the plugin from the Gaim
+preferences dialog.
 
 Windows:
 ================
