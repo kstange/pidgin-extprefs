@@ -55,8 +55,11 @@ static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/l
 static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
 static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
+static const char *pref_blist_hidden     = "/plugins/gtk/kstange/extendedprefs/blist_hidden";
 
 static GList *pref_callbacks;
+
+static gboolean logging_in = FALSE;
 
 static void
 size_set(const char *widget, int value) {
@@ -321,13 +324,35 @@ blist_shrink_update(const char *pref, GaimPrefType type, gpointer value,
 }
 
 static void
+blist_show_cb(GtkWidget *blist, void *nothing)
+{
+	if(logging_in == TRUE)
+		gtk_widget_hide(blist);
+}
+
+static void
 blist_created_cb(GaimBuddyList *blist, void *data) {
+	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(blist);
+
 	blist_taskbar_update(NULL, 0, NULL, NULL);
 	blist_shrink_update(NULL, 0, NULL, NULL);
 
 	if (gaim_prefs_get_bool(pref_blist_autohide) && (gboolean)data == TRUE) {
-	  gtk_widget_hide(GAIM_GTK_BLIST(blist)->window);
+		gtk_widget_hide(gtkblist->window);
+		logging_in = TRUE;
+
+		g_signal_connect(G_OBJECT(gtkblist->window), "show",
+						 G_CALLBACK(blist_show_cb), NULL);
 	}
+}
+
+static void
+blist_signon_check_cb(GaimConnection *gc, void *data)
+{
+	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
+
+	if (gaim_connections_get_connecting() == NULL)
+		logging_in = FALSE;
 }
 
 static gboolean
@@ -353,6 +378,7 @@ gboolean plugin_load(GaimPlugin *plugin) {
 	}
 
 	gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), (gpointer)TRUE);
+	gaim_signal_connect(gaim_connections_get_handle(), "signed-on", plugin, GAIM_CALLBACK(blist_signon_check_cb), NULL);
 
 	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-joining", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
 	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-leaving", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
@@ -543,6 +569,7 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_bool(pref_blist_taskbar, TRUE);
 	gaim_prefs_add_bool(pref_blist_allow_shrink, FALSE);
 	gaim_prefs_add_bool(pref_blist_autohide, FALSE);
+	gaim_prefs_add_bool(pref_blist_hidden, FALSE);
 
 	if (gaim_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * gaim_prefs_get_int(pref_conv_zoom);
