@@ -360,12 +360,11 @@ gboolean plugin_load(GaimPlugin *plugin) {
 						"conversation-created", plugin,
 						GAIM_CALLBACK(conv_prefs_init), NULL);
 
-	/** depending when the plugin is loaded, the blist may or may not have been created **/
 	if (gtkblist != NULL && GTK_IS_WINDOW(gtkblist->window)) {
 		blist_created_cb(gaim_get_blist(), NULL);
-	} else {
-		gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), NULL);
 	}
+
+	gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), NULL);
 
 	conv_prefs_init_all();
 	size_prefs_init_all();
@@ -380,7 +379,7 @@ gboolean plugin_unload(GaimPlugin *plugin) {
 		/* FIXME: In Win32, the taskbar entry won't come back till the window
 		   is focused. */
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(gtkblist->window), FALSE);
-	
+
 		GTK_WINDOW(gtkblist->window)->allow_shrink = FALSE;
 	}
 
@@ -537,7 +536,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_blist_allow_shrink));
 	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_shrink_set), NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
-	
+
 	gtk_widget_show_all(ret);
 	return ret;
 }
