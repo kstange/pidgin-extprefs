@@ -458,7 +458,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	/* Buddy List Size */
 	hbox = gtk_hbox_new(FALSE, 5);
 
-	label = gtk_label_new_with_mnemonic(_("Bu_ddy List:"));
+	label = gtk_label_new_with_mnemonic(_("Budd_y List:"));
 	gtk_size_group_add_widget(sg, label);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 
