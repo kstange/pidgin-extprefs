@@ -54,6 +54,7 @@ static const char *pref_conv_size        = "/plugins/gtk/kstange/extendedprefs/c
 static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/log_size";
 static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
+static const char *pref_conv_show_joinpart = "/plugins/gtk/kstange/extendedprefs/conv_show_joinpart";
 
 static void
 spin_pref_set_int(GtkWidget *w, void *data) {
@@ -353,6 +354,11 @@ blist_created_cb(GaimBuddyList *blist, void *data) {
 	blist_shrink_update();
 }
 
+static gboolean
+chat_join_part_cb(GaimConversation *conv, const gchar *name, GaimConvChatBuddyFlags flags, void *data) {
+	return !gaim_prefs_get_bool(pref_conv_show_joinpart);
+}
+
 gboolean plugin_load(GaimPlugin *plugin) {
 	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
 
@@ -365,6 +371,9 @@ gboolean plugin_load(GaimPlugin *plugin) {
 	}
 
 	gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), NULL);
+
+	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-joining", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
+	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-leaving", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
 
 	conv_prefs_init_all();
 	size_prefs_init_all();
@@ -511,6 +520,11 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_invite);
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
 
+	button = gtk_check_button_new_with_mnemonic("Show _join and part messages in chats");
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_joinpart));
+	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_joinpart);
+	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+
 	vbox = gaim_gtk_make_frame (ret, _("Buddy List"));
 
 	/* Tooltip Delay */
@@ -585,6 +599,7 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_bool(pref_conv_show_add, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_info, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_invite, TRUE);
+	gaim_prefs_add_bool(pref_conv_show_joinpart, TRUE);
 	gaim_prefs_add_int(pref_conv_size, 8);
 	gaim_prefs_add_int(pref_popup_size, 8);
 	gaim_prefs_add_int(pref_log_size, 8);
