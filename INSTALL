@@ -1,0 +1,76 @@
+Gaim Extended Preferences Plugin Installation
+==========================================================
+
+Installation of this plugin varies by platform.  Please follow the
+appropriate directions below for your platform.
+
+For reference, any time "extendedprefs-version" is mentioned, you should
+replace the word "version" with the current version of Extended Prefs,
+such as "0.2"
+
+Unix or Linux:
+================
+
+Make sure Gaim and its development headers (often a gaim-devel package for
+your distribution) are installed on your computer.
+
+Extract the source tarball to the location of your choosing and cd to the
+extracted directory:
+
+	tar xzf extendedprefs-version.tar.gz
+	cd extendedprefs-version/
+
+To build the plugin, type:
+
+	make
+
+To install the plugin into your Gaim user directory (~/.gaim/plugins), type:
+
+	make install
+
+If you'd rather copy the plugin to your Gaim installation path, specify
+the prefix value.  For example, if you want to install the plugin to
+/usr/local/lib/gaim/:
+
+	PREFIX="/usr/local" make install
+
+Then simply start or restart Gaim and load the plugin.
+
+Windows:
+================
+
+Extract Gaim source somehow, somewhere, in an appropriate build environment.
+The WinGBEF build fetcher <http://gaim-extprefs.sourceforge.net/extras.shtml>
+might be able to help you with this task.
+
+Extract the source tarball to the plugins/ directory of the gaim source and
+cd to the extracted directory:
+
+	tar xzf extendedprefs-version.tar.gz
+	cd extendedprefs-version/
+
+To build the plugin, type:
+
+	make
+
+If necessary, Gaim's source should be built automatically as it is required
+to install plugins.
+
+Once this is complete, you can install the plugin to the win32-install-dir
+directory, which is usually used for building packages by typing:
+
+	make install
+
+If you'd rather just use the plugin with your regular Gaim installation,
+copy the extendedprefs.dll file from the extendedprefs-version/src/
+directory to your user plugins directory:
+
+	Windows 98/Me:
+	c:\windows\Application Data\.gaim\plugins (default user)
+	c:\windows\profiles\<username>\Application Data\.gaim\plugins
+
+	Windows 2000/XP:
+	c:\documents and settings\<username>\Application Data\.gaim\plugins
+
+Then simply start or restart Gaim and load the plugin from the Gaim
+preferences dialog.

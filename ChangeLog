@@ -1,0 +1,44 @@
+Gaim Extended Preferences Plugin
+
+Version 0.2-r1 (08/21/2004):
+	* Fixed the linux Makefile so that when the plugin compiles perfectly
+	  it is also able to be loaded by Gaim and installs by default to a
+	  location that isn't completely nonsensical. (Stu Tomlinson)
+	* No binary or source changes were made in this release.
+
+Version 0.2 (08/11/2004):
+
+	* Added the ability to change the interface font sizes for the
+	  Buddy List, Information Dialogs, Conversations, and the Log Viewer.
+	* Added the ability to show and hide individual function buttons at
+	  the bottom of IM and chat windows.
+	* Added Unix and Win32 Makefiles. Unix users should be able to build
+	  the plugin outside of the Gaim tree. Win32 users will need to
+	  extract it to the plugins/ directory of recent Gaim source.
+
+Version 0.1.2 (06/25/2004):
+
+	* Service release for compatibility with Gaim 0.79.
+	* Added some checks to prevent crashing if the plugin is loaded by
+	  an incompatible Gaim version.  If this happens, font zooming won't
+	  work, so a notice will appear to warn the user of this condition.
+	* Stopped trying to both add and remove the preference for hiding
+	  the IM button bar in conversations because this caused a crash
+	  I couldn't find and the former half was not supposed to happen
+	  anymore anyway.
+
+Version 0.1.1 (06/01/2004):
+
+	* Service release for compatibility with Gaim 0.78 API.
+	* Removed option to hide the IM and Chat function buttons as this
+	  functionality is now provided within Gaim.
+
+Version 0.1 (04/23/2004):
+
+	* Added option to set a zoom on all conversation windows' font
+	  sizes.
+	* Added option to hide the IM and Chat function buttons.
+	* Added interface to Gaim's hidden option for changing the tooltip
+	  delay.  Setting this to 0 turns off tooltips.
+	* Added option to hide the buddy list entry in your taskbar, if your
+	  window manager supports this hint.

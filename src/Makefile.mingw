@@ -1,0 +1,96 @@
+#
+# Gaim Extended Preferences Plugin Source Makefile (Win32-MinGW)
+#
+# Copyright 2004 Kevin Stange <extprefs@simguy.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+ifeq ($(PREFIX),)
+  PREFIX = $(GAIM_TOP)/win32-install-dir
+endif
+
+EP_TOP   =		../
+GTK_TOP  =		../../../../win32-dev/gtk_2_0
+GAIM_TOP =		../../..
+DLL_INSTALL_DIR  =	$(PREFIX)/plugins
+
+EP = extendedprefs
+EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
+
+CFLAGS =
+
+DEFINES = -DEP_VERSION=\"$(EP_VERSION)\"
+
+# We need some Gaim makefile information
+include $(GAIM_TOP)/src/win32/global.mak
+
+INCLUDE_PATHS +=	-I. \
+			-I$(GTK_TOP)/include \
+			-I$(GTK_TOP)/include/gtk-2.0 \
+			-I$(GTK_TOP)/include/glib-2.0 \
+			-I$(GTK_TOP)/include/pango-1.0 \
+			-I$(GTK_TOP)/include/atk-1.0 \
+			-I$(GTK_TOP)/lib/glib-2.0/include \
+			-I$(GTK_TOP)/lib/gtk-2.0/include \
+			-I$(GAIM_TOP)/src \
+			-I$(GAIM_TOP)/src/win32 \
+			-I$(GAIM_TOP)
+
+
+LIB_PATHS =		-L$(GTK_TOP)/lib \
+			-L$(GAIM_TOP)/src
+
+EP_SRC =	extendedprefs.c
+
+EP_OBJ = $(EP_SRC:%.c=%.o)
+
+PLUGIN_LIBS = \
+	-lgtk-win32-2.0 \
+	-lglib-2.0 \
+	-lpango-1.0 \
+	-lgdk-win32-2.0 \
+	-lgdk_pixbuf-2.0 \
+	-lgmodule-2.0 \
+	-lgobject-2.0 \
+	-lws2_32 \
+	-lintl \
+	-lgaim
+
+%.o: %.c
+	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(DEFINES) -c $< -o $@
+
+.PHONY: all clean install
+
+all: $(EP).dll
+	echo $(PREFIX)
+
+install: all
+	mkdir -p "$(DLL_INSTALL_DIR)"
+	cp $(EP).dll "$(DLL_INSTALL_DIR)"
+
+
+# We need Gaim!!  Make it if we don't have it.
+$(GAIM_TOP)/src/gaim.lib:
+	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
+	$(MAKE) -C $(GAIM_TOP)/src -f Makefile.mingw gaim.lib
+
+$(EP).dll: $(EP_OBJ) $(GAIM_TOP)/src/gaim.lib
+	$(CC) -shared $(EP_OBJ) $(LIB_PATHS) $(PLUGIN_LIBS) $(DLL_LD_FLAGS) -o $(EP).dll
+
+clean:
+	rm -rf *.o
+	rm -rf $(EP).dll
