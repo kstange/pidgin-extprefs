@@ -19,8 +19,6 @@
  */
 #include "internal.h"
 
-#include "notify.h"
-#include "prefs.h"
 #include "signals.h"
 #include "version.h"
 
@@ -28,6 +26,7 @@
 #include "gtkconv.h"
 #include "gtkimhtml.h"
 #include "gtkplugin.h"
+#include "gtkprefs.h"
 #include "gtkutils.h"
 
 #define KSTANGE_EP_PLUGIN_ID     "gtk-kstange-extendedprefs"
@@ -49,19 +48,15 @@ static const char *pref_conv_show_file   = "/plugins/gtk/kstange/extendedprefs/c
 static const char *pref_conv_show_add    = "/plugins/gtk/kstange/extendedprefs/conv_buttons/add";
 static const char *pref_conv_show_info   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/info";
 static const char *pref_conv_show_invite = "/plugins/gtk/kstange/extendedprefs/conv_buttons/invite";
+static const char *pref_conv_show_joinpart = "/plugins/gtk/kstange/extendedprefs/conv_show_joinpart";
 static const char *pref_popup_size       = "/plugins/gtk/kstange/extendedprefs/popup_size";
 static const char *pref_conv_size        = "/plugins/gtk/kstange/extendedprefs/conv_size";
 static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/log_size";
 static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
-static const char *pref_conv_show_joinpart = "/plugins/gtk/kstange/extendedprefs/conv_show_joinpart";
+static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
 
-static void
-spin_pref_set_int(GtkWidget *w, void *data) {
-	int value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(w));
-	char *pref = (char *)data;
-	gaim_prefs_set_int(pref, value);
-}
+static GList *pref_callbacks;
 
 static void
 size_set(const char *widget, int value) {
@@ -121,28 +116,23 @@ size_prefs_init_all() {
 }
 
 static void
-size_prefs_update(GtkWidget *w, void *pref) {
-	int value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(w));
+size_prefs_update(const char *pref, GaimPrefType type, gpointer val,
+				  gpointer user_data)
+{
+	gint value = GPOINTER_TO_INT(val);
 
-	if (value < KSTANGE_EP_SIZE_MIN)
-		gtk_spin_button_set_value(GTK_SPIN_BUTTON(w), KSTANGE_EP_SIZE_MIN);
-	else if (value > KSTANGE_EP_SIZE_MAX)
-		gtk_spin_button_set_value(GTK_SPIN_BUTTON(w), KSTANGE_EP_SIZE_MAX);
-	else
-		gaim_prefs_set_int((const char *)pref, value);
-
-	if ((const char *)pref == pref_conv_size) {
+	if (!strcmp(pref, pref_conv_size)) {
 		size_set("gaim_gtkconv_entry", value);
 		size_set("gaim_gtkconv_imhtml", value);
 		size_set("gaim_gtkprefs_font_imhtml", value);
 	}
-	else if ((const char *)pref == pref_popup_size) {
+	else if (!strcmp(pref, pref_popup_size)) {
 		size_set("gaim_gtkrequest_imhtml", value);
 		size_set("gaim_gtknotify_imhtml", value);
 	}
-	else if ((const char *)pref == pref_log_size)
+	else if (!strcmp(pref, pref_log_size))
 		size_set("gaim_gtklog_imhtml", value);
-	else if ((const char *)pref == pref_blist_size)
+	else if (!strcmp(pref, pref_blist_size))
 		size_set("gaim_gtkblist_treeview", value);
 
 	reset_theme();
@@ -201,20 +191,13 @@ conv_buttons_set(GaimConversation *c, const char *pref, gboolean value) {
 }
 
 static void
-conv_buttons_set_all(const char *pref, gboolean value) {
+conv_buttons_set_all(const char *pref, GaimPrefType type, gpointer value,
+					 gpointer user_data)
+{
 	GList *conv;
 
 	for(conv = gaim_get_conversations(); conv != NULL; conv = conv->next)
-		conv_buttons_set(conv->data, pref, value);
-}
-
-static void
-conv_buttons_update(GtkWidget *w, void *data) {
-	gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
-	const char *pref = (char *)data;
-
-	gaim_prefs_set_bool(pref, value);
-	conv_buttons_set_all(pref, value);
+		conv_buttons_set(conv->data, pref, GPOINTER_TO_INT(value));
 }
 
 static void
@@ -301,32 +284,29 @@ conv_prefs_clear_all() {
 }
 
 static void
-blist_taskbar_update() {
+blist_taskbar_update(const char *pref, GaimPrefType type, gpointer value,
+					 gpointer user_data)
+{
 	GaimBuddyList *blist = gaim_get_blist();
 	GaimGtkBuddyList *gtkblist;
 
 	if (blist) {
 		/* FIXME: In Win32, the taskbar entry won't come back till the window
-		   is focused. */
+		   is focused. This is probably a GTK bug. */
 	  	gtkblist = GAIM_GTK_BLIST(blist);
 
 		if (!GTK_IS_WINDOW(gtkblist->window))
 			return;
 
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(gtkblist->window),
-										 !gaim_prefs_get_bool(pref_blist_taskbar));
+										 !GPOINTER_TO_INT(value));
 	}
 }
 
 static void
-blist_taskbar_set(GtkWidget *w) {
-	gaim_prefs_set_bool(pref_blist_taskbar,
-						gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)));
-	blist_taskbar_update();
-}
-
-static void
-blist_shrink_update() {
+blist_shrink_update(const char *pref, GaimPrefType type, gpointer value,
+					gpointer user_data)
+{
 	GaimBuddyList *blist = gaim_get_blist();
 
 	if (blist) {
@@ -335,28 +315,30 @@ blist_shrink_update() {
 		if (!GTK_IS_WINDOW(gtkblist->window))
 			return;
 
-		GTK_WINDOW(gtkblist->window)->allow_shrink =
-			gaim_prefs_get_bool(pref_blist_allow_shrink);
+		GTK_WINDOW(gtkblist->window)->allow_shrink = GPOINTER_TO_INT(value);
 
 	}
 }
 
 static void
-blist_shrink_set(GtkWidget *w) {
-	gaim_prefs_set_bool(pref_blist_allow_shrink,
-			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)));
-	blist_shrink_update();
-}
-
-static void
 blist_created_cb(GaimBuddyList *blist, void *data) {
-	blist_taskbar_update();
-	blist_shrink_update();
+	blist_taskbar_update(NULL, 0, NULL, NULL);
+	blist_shrink_update(NULL, 0, NULL, NULL);
+
+	if (gaim_prefs_get_bool(pref_blist_autohide) && (gboolean)data == TRUE) {
+	  gtk_widget_hide(GAIM_GTK_BLIST(blist)->window);
+	}
 }
 
 static gboolean
 chat_join_part_cb(GaimConversation *conv, const gchar *name, GaimConvChatBuddyFlags flags, void *data) {
 	return !gaim_prefs_get_bool(pref_conv_show_joinpart);
+}
+
+static void
+connect_callback(const char *pref, GaimPrefCallback function) {
+	guint callback = gaim_prefs_connect_callback(pref, function, NULL);
+	pref_callbacks = g_list_append(pref_callbacks, &callback);
 }
 
 gboolean plugin_load(GaimPlugin *plugin) {
@@ -367,16 +349,32 @@ gboolean plugin_load(GaimPlugin *plugin) {
 						GAIM_CALLBACK(conv_prefs_init), NULL);
 
 	if (gtkblist != NULL && GTK_IS_WINDOW(gtkblist->window)) {
-		blist_created_cb(gaim_get_blist(), NULL);
+		blist_created_cb(gaim_get_blist(), (gpointer)FALSE);
 	}
 
-	gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), NULL);
+	gaim_signal_connect(gaim_gtk_blist_get_handle(), "gtkblist-created", plugin, GAIM_CALLBACK(blist_created_cb), (gpointer)TRUE);
 
 	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-joining", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
 	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-leaving", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
 
 	conv_prefs_init_all();
 	size_prefs_init_all();
+
+	/* Connect the preference callbacks we want to use. */
+	connect_callback(pref_conv_size,  size_prefs_update);
+	connect_callback(pref_log_size,   size_prefs_update);
+	connect_callback(pref_popup_size, size_prefs_update);
+	connect_callback(pref_blist_size, size_prefs_update);
+
+	connect_callback(pref_conv_show_add,    conv_buttons_set_all);
+	connect_callback(pref_conv_show_warn,   conv_buttons_set_all);
+	connect_callback(pref_conv_show_block,  conv_buttons_set_all);
+	connect_callback(pref_conv_show_file,   conv_buttons_set_all);
+	connect_callback(pref_conv_show_info,   conv_buttons_set_all);
+	connect_callback(pref_conv_show_invite, conv_buttons_set_all);
+
+	connect_callback(pref_blist_taskbar,      blist_taskbar_update);
+	connect_callback(pref_blist_allow_shrink, blist_shrink_update);
 
 	return TRUE;
 }
@@ -392,6 +390,8 @@ gboolean plugin_unload(GaimPlugin *plugin) {
 		GTK_WINDOW(gtkblist->window)->allow_shrink = FALSE;
 	}
 
+	g_list_foreach(pref_callbacks, (GFunc)gaim_prefs_disconnect_callback, NULL);
+
 	conv_prefs_clear_all();
 	size_prefs_clear_all();
 
@@ -400,10 +400,8 @@ gboolean plugin_unload(GaimPlugin *plugin) {
 
 static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	GtkWidget *ret;
-	GtkWidget *spinner, *button;
-	GtkWidget *vbox, *hbox;
+	GtkWidget *vbox;
 	GtkWidget *label;
-	GtkAdjustment *adj;
 	GtkSizeGroup *sg;
 
 	ret = gtk_vbox_new(FALSE, 18);
@@ -411,75 +409,35 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	vbox = gaim_gtk_make_frame (ret, _("Interface Font Sizes (points)"));
 
-	/* Conversations */
-	hbox = gtk_hbox_new(FALSE, 5);
-
 	sg = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
-	label = gtk_label_new_with_mnemonic(_("_Conversations:"));
-	gtk_size_group_add_widget(sg, label);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
-
-	adj = (GtkAdjustment *)gtk_adjustment_new(gaim_prefs_get_int(pref_conv_size), KSTANGE_EP_SIZE_MIN, KSTANGE_EP_SIZE_MAX, 1, 1, 0);
-	spinner = gtk_spin_button_new(adj, 0, 0);
-	gtk_signal_connect(GTK_OBJECT(spinner), "value-changed", GTK_SIGNAL_FUNC(size_prefs_update), (void *)pref_conv_size);
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinner);
-
-	gtk_box_pack_start(GTK_BOX(hbox), spinner, FALSE, FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	/* Conversations */
+	gaim_gtk_prefs_labeled_spin_button(vbox, "_Conversations:",
+									   pref_conv_size,
+									   KSTANGE_EP_SIZE_MIN,
+									   KSTANGE_EP_SIZE_MAX,
+									   sg);
 
 	/* Log Viewer Size */
-	hbox = gtk_hbox_new(FALSE, 5);
-
-	label = gtk_label_new_with_mnemonic(_("Log _Viewer:"));
-	gtk_size_group_add_widget(sg, label);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
-
-	adj = (GtkAdjustment *)gtk_adjustment_new(gaim_prefs_get_int(pref_log_size), KSTANGE_EP_SIZE_MIN, KSTANGE_EP_SIZE_MAX, 1, 1, 0);
-	spinner = gtk_spin_button_new(adj, 0, 0);
-	gtk_signal_connect(GTK_OBJECT(spinner), "value-changed", GTK_SIGNAL_FUNC(size_prefs_update), (void *)pref_log_size);
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinner);
-
-	gtk_box_pack_start(GTK_BOX(hbox), spinner, FALSE, FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	gaim_gtk_prefs_labeled_spin_button(vbox, "Log _Viewer:",
+									   pref_log_size,
+									   KSTANGE_EP_SIZE_MIN,
+									   KSTANGE_EP_SIZE_MAX,
+									   sg);
 
 	/* Popup Dialogs */
-	hbox = gtk_hbox_new(FALSE, 5);
-
-	label = gtk_label_new_with_mnemonic(_("Information _Dialogs:"));
-	gtk_size_group_add_widget(sg, label);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
-
-	adj = (GtkAdjustment *)gtk_adjustment_new(gaim_prefs_get_int(pref_popup_size), KSTANGE_EP_SIZE_MIN, KSTANGE_EP_SIZE_MAX, 1, 1, 0);
-	spinner = gtk_spin_button_new(adj, 0, 0);
-	gtk_signal_connect(GTK_OBJECT(spinner), "value-changed", GTK_SIGNAL_FUNC(size_prefs_update), (void *)pref_popup_size);
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinner);
-
-	gtk_box_pack_start(GTK_BOX(hbox), spinner, FALSE, FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	gaim_gtk_prefs_labeled_spin_button(vbox, "Information _Dialogs:",
+									   pref_popup_size,
+									   KSTANGE_EP_SIZE_MIN,
+									   KSTANGE_EP_SIZE_MAX,
+									   sg);
 
 	/* Buddy List Size */
-	hbox = gtk_hbox_new(FALSE, 5);
-
-	label = gtk_label_new_with_mnemonic(_("Budd_y List:"));
-	gtk_size_group_add_widget(sg, label);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
-
-	adj = (GtkAdjustment *)gtk_adjustment_new(gaim_prefs_get_int(pref_blist_size), KSTANGE_EP_SIZE_MIN, KSTANGE_EP_SIZE_MAX, 1, 1, 0);
-	spinner = gtk_spin_button_new(adj, 0, 0);
-	gtk_signal_connect(GTK_OBJECT(spinner), "value-changed", GTK_SIGNAL_FUNC(size_prefs_update), (void *)pref_blist_size);
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinner);
-
-	gtk_box_pack_start(GTK_BOX(hbox), spinner, FALSE, FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	gaim_gtk_prefs_labeled_spin_button(vbox, "Budd_y List:",
+									   pref_blist_size,
+									   KSTANGE_EP_SIZE_MIN,
+									   KSTANGE_EP_SIZE_MAX,
+									   sg);
 
 	if (!gtk_check_version(2, 4, 0)) {
 		label = gtk_label_new_with_mnemonic(_("You must close and reopen any affected windows\nbesides the buddy list for font changes to take effect."));
@@ -490,66 +448,45 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	vbox = gaim_gtk_make_frame (ret, _("Conversations"));
 
-	button = gtk_check_button_new_with_mnemonic("Show _Add/Remove button in IMs and chats");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_add));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_add);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show _Add/Remove button in IMs and chats",
+							pref_conv_show_add, vbox);
 
-	button = gtk_check_button_new_with_mnemonic("Show _Warn button in IMs");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_warn));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_warn);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show _Warn button in IMs",
+							pref_conv_show_warn, vbox);
 
-	button = gtk_check_button_new_with_mnemonic("Show _Block button in IMs");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_block));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_block);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show _Block button in IMs",
+							pref_conv_show_block, vbox);
 
-	button = gtk_check_button_new_with_mnemonic("Show _Send File button in IMs");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_file));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_file);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show Send _File button in IMs",
+							pref_conv_show_file, vbox);
 
-	button = gtk_check_button_new_with_mnemonic("Show I_nfo button in IMs");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_info));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_info);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show I_nfo button in IMs",
+							pref_conv_show_info, vbox);
 
-	button = gtk_check_button_new_with_mnemonic("Show _Invite button in chats");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_invite));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_invite);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show _Invite button in chats",
+							pref_conv_show_invite, vbox);
 
-	button = gtk_check_button_new_with_mnemonic("Show _join and part messages in chats");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_conv_show_joinpart));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(conv_buttons_update), (void *)pref_conv_show_joinpart);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show _join and part messages in chats",
+							pref_conv_show_joinpart, vbox);
 
 	vbox = gaim_gtk_make_frame (ret, _("Buddy List"));
 
 	/* Tooltip Delay */
-	hbox = gtk_hbox_new(FALSE, 5);
+	gaim_gtk_prefs_labeled_spin_button(vbox, "_Tooltip reveal delay (ms):",
+									   pref_tooltip_delay,
+									   KSTANGE_EP_BLIST_TIP_MIN,
+									   KSTANGE_EP_BLIST_TIP_MAX,
+									   NULL);
 
-	label = gtk_label_new_with_mnemonic(_("_Tooltip reveal delay (ms):"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
+	/* Window Widget Tweaking Prefs */
+	gaim_gtk_prefs_checkbox("Show buddy _list entry in taskbar",
+							pref_blist_taskbar, vbox);
 
-	adj = (GtkAdjustment *)gtk_adjustment_new(gaim_prefs_get_int(pref_tooltip_delay), KSTANGE_EP_BLIST_TIP_MIN, KSTANGE_EP_BLIST_TIP_MAX, 100, 100, 0);
-	spinner = gtk_spin_button_new(adj, 0, 0);
-	gtk_signal_connect(GTK_OBJECT(spinner), "value-changed", GTK_SIGNAL_FUNC(spin_pref_set_int), (void *)pref_tooltip_delay);
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinner);
+	gaim_gtk_prefs_checkbox("Hide buddy list at _signon",
+							pref_blist_autohide, vbox);
 
-	gtk_box_pack_start(GTK_BOX(hbox), spinner, FALSE, FALSE, 5);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-
-	button = gtk_check_button_new_with_mnemonic("Show buddy _list entry in taskbar");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_blist_taskbar));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_taskbar_set), NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
-
-	button = gtk_check_button_new_with_mnemonic("Allow buddy list to s_hrink below normal size constraints");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_blist_allow_shrink));
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_shrink_set), NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Allow buddy list to s_hrink below normal size constraints",
+							pref_blist_allow_shrink, vbox);
 
 	gtk_widget_show_all(ret);
 	return ret;
@@ -591,7 +528,6 @@ init_plugin(GaimPlugin *plugin)
 {
 	gaim_prefs_add_none("/plugins/gtk/kstange");
 	gaim_prefs_add_none("/plugins/gtk/kstange/extendedprefs");
-	gaim_prefs_add_bool(pref_blist_taskbar, TRUE);
 	gaim_prefs_add_none("/plugins/gtk/kstange/extendedprefs/conv_buttons");
 	gaim_prefs_add_bool(pref_conv_show_warn, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_block, TRUE);
@@ -604,7 +540,9 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_int(pref_popup_size, 8);
 	gaim_prefs_add_int(pref_log_size, 8);
 	gaim_prefs_add_int(pref_blist_size, 8);
+	gaim_prefs_add_bool(pref_blist_taskbar, TRUE);
 	gaim_prefs_add_bool(pref_blist_allow_shrink, FALSE);
+	gaim_prefs_add_bool(pref_blist_autohide, FALSE);
 
 	if (gaim_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * gaim_prefs_get_int(pref_conv_zoom);

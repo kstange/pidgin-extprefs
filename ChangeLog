@@ -3,6 +3,9 @@ Gaim Extended Preferences Plugin
 Version 0.4:
 	* Ported the ability to hide the join and part messages from chats
 	  from Guifications. (Stu Tomlinson)
+	* Added the option to automatically hide the buddy list when it first
+	  appears at signon. (Gary Kramlich)
+	* Significant code cleanup was done in the UI code.
 
 Version 0.3 (09/16/2004):
 	* Gaim 1.x.x binary and source compatibility.
