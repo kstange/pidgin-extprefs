@@ -532,7 +532,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_taskbar_set), NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
 
-	button = gtk_check_button_new_with_mnemonic("Allow buddy list to s_hrink");
+	button = gtk_check_button_new_with_mnemonic("Allow buddy list to s_hrink below normal size constraints");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), gaim_prefs_get_bool(pref_blist_allow_shrink));
 	gtk_signal_connect(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(blist_shrink_set), NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
