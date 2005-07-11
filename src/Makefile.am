@@ -11,7 +11,7 @@ libextprefs_la_SOURCES = extendedprefs.c
 endif
 
 AM_CPPFLAGS = \
-	-DEP_VERSION=\"$EXTPREFS_VERSION\" \
+	-DEP_VERSION=\"$(VERSION)\" \
 	-DLIBDIR=\"$(libdir)/gaim/\" \
 	-DDATADIR=\"$(datadir)\" \
 	$(GTK_CFLAGS) \
