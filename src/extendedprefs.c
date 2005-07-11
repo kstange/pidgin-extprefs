@@ -332,7 +332,7 @@ blist_shrink_update(const char *pref, GaimPrefType type, gpointer value,
 static void
 blist_show_cb(GtkWidget *blist, void *nothing)
 {
-	if(logging_in == TRUE)
+	if(gaim_prefs_get_bool(pref_blist_autohide) && logging_in == TRUE)
 		gtk_widget_hide(blist);
 }
 
@@ -343,12 +343,12 @@ blist_created_cb(GaimBuddyList *blist, void *data) {
 	blist_taskbar_update(NULL, 0, (gpointer)gaim_prefs_get_bool(pref_blist_taskbar), NULL);
 	blist_shrink_update(NULL, 0, (gpointer)gaim_prefs_get_bool(pref_blist_allow_shrink), NULL);
 
+	g_signal_connect(G_OBJECT(gtkblist->window), "show",
+					 G_CALLBACK(blist_show_cb), NULL);
+
 	if (gaim_prefs_get_bool(pref_blist_autohide) && (gboolean)data == TRUE) {
 		gtk_widget_hide(gtkblist->window);
 		logging_in = TRUE;
-
-		g_signal_connect(G_OBJECT(gtkblist->window), "show",
-						 G_CALLBACK(blist_show_cb), NULL);
 	}
 }
 
@@ -441,30 +441,35 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	sg = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
+	/* XXX: These spinbutton functions are supposed to be taking
+	 *      const char *, but they were originally written with char *.
+	 *      This will be fixed in Gaim 2.0.0.
+	 */
+
 	/* Conversations */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "_Conversations:",
-									   pref_conv_size,
+									   (char *)pref_conv_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
 	/* Log Viewer Size */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "Log _Viewer:",
-									   pref_log_size,
+									   (char *)pref_log_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
 	/* Popup Dialogs */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "Information _Dialogs:",
-									   pref_popup_size,
+									   (char *)pref_popup_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
 	/* Buddy List Size */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "Budd_y List:",
-									   pref_blist_size,
+									   (char *)pref_blist_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
@@ -503,7 +508,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	/* Tooltip Delay */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "_Tooltip reveal delay (ms):",
-									   pref_tooltip_delay,
+									   (char *)pref_tooltip_delay,
 									   KSTANGE_EP_BLIST_TIP_MIN,
 									   KSTANGE_EP_BLIST_TIP_MAX,
 									   NULL);

@@ -6,6 +6,7 @@ Version 0.5:
 	  Many, many thanks to Don Seiler for getting the ball rolling.
 	* Fixed the bugs which prevented the buddy list shrink and taskbar
 	  entry preferences from being honored at load time.
+	* Hide Buddy List at Signon option should work more reliably.
 
 Version 0.4 (12/13/2004):
 	* Ported the ability to hide the join and part messages from chats
