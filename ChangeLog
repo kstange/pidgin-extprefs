@@ -1,6 +1,9 @@
 Gaim Extended Preferences Plugin
 
 Version 0.5:
+	* automake, autoconf are now used to configure the plugin for
+	  non-Windows environments. This should fix a lot of build problems.
+	  Many, many thanks to Don Seiler for getting the ball rolling.
 	* Fixed the bugs which prevented the buddy list shrink and taskbar
 	  entry preferences from being honored at load time.
 
