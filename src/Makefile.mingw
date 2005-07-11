@@ -28,14 +28,14 @@ GAIM_TOP =		../../..
 DLL_INSTALL_DIR  =	$(PREFIX)/plugins
 
 EP = extendedprefs
-EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
+VERSION = $(shell cat ${EP_TOP}/VERSION)
 
 CFLAGS =
 
-DEFINES = -DEP_VERSION=\"$(EP_VERSION)\"
+DEFINES = -DVERSION=\"$(VERSION)\"
 
 # We need some Gaim makefile information
-include $(GAIM_TOP)/src/win32/global.mak
+#include $(GAIM_TOP)/src/win32/global.mak
 
 INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include \

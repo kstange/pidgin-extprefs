@@ -1,0 +1,42 @@
+#
+# Gaim Extended Preferences Plugin Win32 Makefile
+#
+# Copyright 2004 Kevin Stange <extprefs@simguy.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+EP_SRC =		./src
+
+BIN_DIST =	ChangeLog \
+			INSTALL-win32.txt \
+			LICENSE
+
+VERSION = $(shell cat ./VERSION)
+
+all:
+	$(MAKE) -C $(EP_SRC) -f Makefile.mingw
+
+install: all
+	$(MAKE) -C $(EP_SRC) -f Makefile.mingw install
+
+zip: all
+	cp src/extendedprefs.dll ./
+	zip -qD extendedprefs-$(VERSION).zip $(BIN_DIST) extendedprefs.dll
+	rm -f extendedprefs.dll
+
+clean:
+	$(MAKE) -C $(EP_SRC) -f Makefile.mingw clean
+	rm -f extendedprefs-*.zip

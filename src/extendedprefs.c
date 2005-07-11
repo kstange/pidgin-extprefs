@@ -1,7 +1,7 @@
 /*
  * Gaim Extended Preferences Plugin
  *
- * Copyright 2004 Kevin Stange <extprefs@simguy.net>
+ * Copyright 2004-05 Kevin Stange <extprefs@simguy.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include "internal.h"
+
+#ifndef _WIN32
+# ifdef HAVE_CONFIG_H
+#  include "../extprefs_config.h"
+# endif
+#endif
+
+#include <math.h>
+#include <string.h>
 
 #include "signals.h"
 #include "version.h"
@@ -428,7 +436,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	ret = gtk_vbox_new(FALSE, 18);
 	gtk_container_set_border_width (GTK_CONTAINER (ret), 12);
 
-	vbox = gaim_gtk_make_frame (ret, _("Interface Font Sizes (points)"));
+	vbox = gaim_gtk_make_frame (ret, "Interface Font Sizes (points)");
 
 	sg = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
@@ -461,13 +469,13 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 									   sg);
 
 	if (!gtk_check_version(2, 4, 0)) {
-		label = gtk_label_new_with_mnemonic(_("You must close and reopen any affected windows\nbesides the buddy list for font changes to take effect."));
+		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nbesides the buddy list for font changes to take effect.");
 	} else {
-		label = gtk_label_new_with_mnemonic(_("You must close and reopen any affected windows\nfor font changes to take effect."));
+		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nfor font changes to take effect.");
 	}
 	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 
-	vbox = gaim_gtk_make_frame (ret, _("Conversations"));
+	vbox = gaim_gtk_make_frame (ret, "Conversations");
 
 	gaim_gtk_prefs_checkbox("Show _Add/Remove button in IMs and chats",
 							pref_conv_show_add, vbox);
@@ -490,7 +498,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	gaim_gtk_prefs_checkbox("Show _join and part messages in chats",
 							pref_conv_show_joinpart, vbox);
 
-	vbox = gaim_gtk_make_frame (ret, _("Buddy List"));
+	vbox = gaim_gtk_make_frame (ret, "Buddy List");
 
 	/* Tooltip Delay */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "_Tooltip reveal delay (ms):",
@@ -529,10 +537,10 @@ static GaimPluginInfo info =
 	NULL,
 	GAIM_PRIORITY_DEFAULT,
 	KSTANGE_EP_PLUGIN_ID,
-	N_("Extended Preferences"),
-	EP_VERSION,
-	N_("Extended Gaim preferences not officially supported by Gaim."),
-	N_("Provides several extended preferences for Gaim users.  These were omitted from Gaim for various reasons, but were popular requests from Gaim users.\n\nNote: This plugin is not supported by the official Gaim project.  Do not bug the developers about this plugin!"),
+	"Extended Preferences",
+	VERSION,
+	"Extended Gaim preferences not officially supported by Gaim.",
+	"Provides several extended preferences for Gaim users.  These were omitted from Gaim for various reasons, but were popular requests from Gaim users.\n\nNote: This plugin is not supported by the official Gaim project.  Do not bug the developers about this plugin!",
 	"Kevin Stange <extprefs@simguy.net>",
 	"http://gaim-extprefs.sf.net/",
 	plugin_load,

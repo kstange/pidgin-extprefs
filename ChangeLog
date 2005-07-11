@@ -1,5 +1,9 @@
 Gaim Extended Preferences Plugin
 
+Version 0.5:
+	* Fixed the bugs which prevented the buddy list shrink and taskbar
+	  entry preferences from being honored at load time.
+
 Version 0.4 (12/13/2004):
 	* Ported the ability to hide the join and part messages from chats
 	  from Guifications. (Stu Tomlinson)
