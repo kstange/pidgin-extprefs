@@ -33,7 +33,7 @@ install: all
 	$(MAKE) -C $(EP_SRC) -f Makefile.mingw install
 
 zip: all
-	cp src/extendedprefs.dll ./
+	cp src/extprefs.dll ./
 	zip -qD gaim-extprefs-$(VERSION).zip $(BIN_DIST) extprefs.dll
 	rm -f extprefs.dll
 
