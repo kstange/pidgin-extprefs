@@ -24,8 +24,7 @@
 # endif
 #endif
 
-#include <math.h>
-#include <string.h>
+#include "internal.h"
 
 #include "signals.h"
 #include "version.h"
@@ -371,7 +370,8 @@ connect_callback(const char *pref, GaimPrefCallback function) {
 	pref_callbacks = g_list_append(pref_callbacks, &callback);
 }
 
-gboolean plugin_load(GaimPlugin *plugin) {
+static gboolean
+plugin_load(GaimPlugin *plugin) {
 	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
 
 	gaim_signal_connect((void*)gaim_conversations_get_handle(),
@@ -410,7 +410,8 @@ gboolean plugin_load(GaimPlugin *plugin) {
 	return TRUE;
 }
 
-gboolean plugin_unload(GaimPlugin *plugin) {
+static gboolean
+plugin_unload(GaimPlugin *plugin) {
 	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
 
 	if (gtkblist != NULL && GTK_IS_WINDOW(gtkblist->window)) {
@@ -538,8 +539,8 @@ static GaimPluginInfo info =
 	GAIM_PRIORITY_DEFAULT,
 	KSTANGE_EP_PLUGIN_ID,
 	"Extended Preferences",
-	VERSION,
-	"Extended Gaim preferences not officially supported by Gaim.",
+	EP_VERSION,
+	"Extended preferences not officially supported by Gaim.",
 	"Provides several extended preferences for Gaim users.  These were omitted from Gaim for various reasons, but were popular requests from Gaim users.\n\nNote: This plugin is not supported by the official Gaim project.  Do not bug the developers about this plugin!",
 	"Kevin Stange <extprefs@simguy.net>",
 	"http://gaim-extprefs.sf.net/",
@@ -583,4 +584,4 @@ init_plugin(GaimPlugin *plugin)
 	}
 }
 
-GAIM_INIT_PLUGIN(convoptions, init_plugin, info)
+GAIM_INIT_PLUGIN(extendedprefs, init_plugin, info)
