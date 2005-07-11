@@ -27,7 +27,7 @@ GTK_TOP  =		../../../../win32-dev/gtk_2_0
 GAIM_TOP =		../../..
 DLL_INSTALL_DIR  =	$(PREFIX)/plugins
 
-EP = extendedprefs
+EP = extprefs
 VERSION = $(shell cat ${EP_TOP}/VERSION)
 
 CFLAGS =

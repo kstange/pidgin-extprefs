@@ -20,7 +20,7 @@
 
 #ifndef _WIN32
 # ifdef HAVE_CONFIG_H
-#  include "../extprefs_config.h"
+#  include "extprefs_config.h"
 # endif
 #endif
 
