@@ -1,12 +1,14 @@
 Gaim Extended Preferences Plugin
 
 Version 0.5:
-	* automake, autoconf are now used to configure the plugin for
-	  non-Windows environments. This should fix a lot of build problems.
-	  Many, many thanks to Don Seiler for getting the ball rolling.
 	* Fixed the bugs which prevented the buddy list shrink and taskbar
 	  entry preferences from being honored at load time.
 	* Hide Buddy List at Signon option should work more reliably.
+	* You should no longer need to close and reopen conversation windows
+	  to adjust their font sizes.
+	* automake and autoconf are now used to configure the plugin for
+	  non-Windows environments. This should fix a lot of build problems.
+	  Many, many thanks to Don Seiler for getting the ball rolling.
 	* Support compiling with Gaim 2.0.0, though functionality is limited
 	  for now.  Thanks to Gary Kramlich for suggestions.
 
