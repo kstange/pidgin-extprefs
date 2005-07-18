@@ -26,6 +26,7 @@
 
 #define GAIM_PLUGINS
 
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -73,6 +74,8 @@ static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/b
 static GList *pref_callbacks;
 #endif
 
+static gdouble _point_sizes [] = { .69444444, .8333333, 1, 1.2, 1.44, 1.728, 2.0736};
+
 static gboolean logging_in = FALSE;
 
 static void
@@ -91,6 +94,35 @@ size_set(const char *widget, int value) {
 	style = g_strdup_printf("widget \"*%s\" style \"%s\"\n", widget, widget);
 	gtk_rc_parse_string(style);
 	g_free(style);
+}
+
+/* This should allow dynamic resizing of coversation text */
+static void
+recalculate_font_sizes(GtkTextTag *tag, gpointer imhtml)
+{
+	if (strncmp(tag->name, "FONT SIZE ", 10) == 0) {
+		GtkTextAttributes *attr = gtk_text_view_get_default_attributes(GTK_TEXT_VIEW(imhtml));
+		int size;
+		size = strtol(tag->name + 10, NULL, 10);
+		g_object_set(G_OBJECT(tag), "size",
+					 (gint) (pango_font_description_get_size(attr->font) *
+							 (double) _point_sizes[size-1]), NULL);
+	}
+}
+
+static void
+resize_imhtml_fonts()
+{
+	GList *conv;
+
+	for(conv = gaim_get_conversations(); conv != NULL; conv = conv->next) {
+		GaimGtkConversation *gtkconv = GAIM_GTK_CONVERSATION((GaimConversation *)conv->data);
+		gtk_text_tag_table_foreach(gtk_text_buffer_get_tag_table(GTK_IMHTML(gtkconv->imhtml)->text_buffer),
+								   recalculate_font_sizes, gtkconv->imhtml);
+		gtk_text_tag_table_foreach(gtk_text_buffer_get_tag_table(GTK_IMHTML(gtkconv->entry)->text_buffer),
+								   recalculate_font_sizes, gtkconv->entry);
+
+	}
 }
 
 static void
@@ -130,6 +162,7 @@ size_prefs_init_all() {
 	value = gaim_prefs_get_int(pref_blist_size);
 	size_set("gaim_gtkblist_treeview", value);
 	reset_theme();
+	resize_imhtml_fonts();
 }
 
 static void
@@ -153,12 +186,14 @@ size_prefs_update(const char *pref, GaimPrefType type, gpointer val,
 		size_set("gaim_gtkblist_treeview", value);
 
 	reset_theme();
+	resize_imhtml_fonts();
 }
 
 static void
 size_prefs_clear_all() {
 	size_set("gaim_gtkconv_entry", 0);
 	size_set("gaim_gtkconv_imhtml", 0);
+	resize_imhtml_fonts();
 	size_set("gaim_gtkrequest_imhtml", 0);
 	size_set("gaim_gtknotify_imhtml", 0);
 	size_set("gaim_gtklog_imhtml", 0);
