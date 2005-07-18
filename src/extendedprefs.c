@@ -537,11 +537,6 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	if (gtk_check_version(2, 4, 0)) {
 		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nfor font changes to take effect.");
 		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-#if !GAIM_VERSION_CHECK(2,0,0)
-	} else {
-		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nbesides the buddy list for font changes to take effect.");
-		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-#endif
 	}
 
 	vbox = gaim_gtk_make_frame (ret, "Conversations");
