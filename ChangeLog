@@ -1,6 +1,6 @@
 Gaim Extended Preferences Plugin
 
-Version 0.5:
+Version 0.5 (07/18/2005):
 	* Fixed the bugs which prevented the buddy list shrink and taskbar
 	  entry preferences from being honored at load time.
 	* Hide Buddy List at Signon option should work more reliably.
