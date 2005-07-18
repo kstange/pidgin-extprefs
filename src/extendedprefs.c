@@ -24,8 +24,12 @@
 # endif
 #endif
 
-#include "internal.h"
+#define GAIM_PLUGINS
 
+#include <string.h>
+#include <math.h>
+
+#include "plugin.h"
 #include "signals.h"
 #include "version.h"
 
@@ -49,12 +53,14 @@ static const char *pref_blist_taskbar    = "/plugins/gtk/kstange/extendedprefs/b
 
 static const char *pref_tooltip_delay    = "/gaim/gtk/blist/tooltip_delay";
 
+#if !GAIM_VERSION_CHECK(2,0,0)
 static const char *pref_conv_show_warn   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/warn";
 static const char *pref_conv_show_block  = "/plugins/gtk/kstange/extendedprefs/conv_buttons/block";
 static const char *pref_conv_show_file   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/file";
 static const char *pref_conv_show_add    = "/plugins/gtk/kstange/extendedprefs/conv_buttons/add";
 static const char *pref_conv_show_info   = "/plugins/gtk/kstange/extendedprefs/conv_buttons/info";
 static const char *pref_conv_show_invite = "/plugins/gtk/kstange/extendedprefs/conv_buttons/invite";
+#endif
 static const char *pref_conv_show_joinpart = "/plugins/gtk/kstange/extendedprefs/conv_show_joinpart";
 static const char *pref_popup_size       = "/plugins/gtk/kstange/extendedprefs/popup_size";
 static const char *pref_conv_size        = "/plugins/gtk/kstange/extendedprefs/conv_size";
@@ -63,7 +69,9 @@ static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/b
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
 static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
 
+#if !GAIM_VERSION_CHECK(2,0,0)
 static GList *pref_callbacks;
+#endif
 
 static gboolean logging_in = FALSE;
 
@@ -159,6 +167,8 @@ size_prefs_clear_all() {
 
 	reset_theme();
 }
+
+#if !GAIM_VERSION_CHECK(2,0,0)
 
 static void
 conv_buttons_set(GaimConversation *c, const char *pref, gboolean value) {
@@ -264,7 +274,6 @@ conv_connect_signals(GtkWidget *ignored, GaimConversation *c)
 	conv_buttons_init(c);
 }
 
-
 static void
 conv_prefs_init(GaimConversation *c) {
 	conv_connect_signals(NULL, c);
@@ -291,6 +300,8 @@ conv_prefs_clear_all() {
 		conv_buttons_set(conv->data, pref_conv_show_invite, TRUE);
 	}
 }
+
+#endif
 
 static void
 blist_taskbar_update(const char *pref, GaimPrefType type, gpointer value,
@@ -365,18 +376,24 @@ chat_join_part_cb(GaimConversation *conv, const gchar *name, GaimConvChatBuddyFl
 }
 
 static void
-connect_callback(const char *pref, GaimPrefCallback function) {
+connect_callback(GaimPlugin *plugin, const char *pref, GaimPrefCallback function) {
+#if GAIM_VERSION_CHECK(2,0,0)
+	gaim_prefs_connect_callback(plugin, pref, function, NULL);
+#else
 	guint callback = gaim_prefs_connect_callback(pref, function, NULL);
 	pref_callbacks = g_list_append(pref_callbacks, &callback);
+#endif
 }
 
 static gboolean
 plugin_load(GaimPlugin *plugin) {
 	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
 
+#if !GAIM_VERSION_CHECK(2,0,0)
 	gaim_signal_connect((void*)gaim_conversations_get_handle(),
 						"conversation-created", plugin,
 						GAIM_CALLBACK(conv_prefs_init), NULL);
+#endif
 
 	if (gtkblist != NULL && GTK_IS_WINDOW(gtkblist->window)) {
 		blist_created_cb(gaim_get_blist(), (gpointer)FALSE);
@@ -388,24 +405,28 @@ plugin_load(GaimPlugin *plugin) {
 	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-joining", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
 	gaim_signal_connect(gaim_conversations_get_handle(), "chat-buddy-leaving", plugin, GAIM_CALLBACK(chat_join_part_cb), NULL);
 
+#if !GAIM_VERSION_CHECK(2,0,0)
 	conv_prefs_init_all();
+#endif
 	size_prefs_init_all();
 
 	/* Connect the preference callbacks we want to use. */
-	connect_callback(pref_conv_size,  size_prefs_update);
-	connect_callback(pref_log_size,   size_prefs_update);
-	connect_callback(pref_popup_size, size_prefs_update);
-	connect_callback(pref_blist_size, size_prefs_update);
+	connect_callback(plugin, pref_conv_size,  size_prefs_update);
+	connect_callback(plugin, pref_log_size,   size_prefs_update);
+	connect_callback(plugin, pref_popup_size, size_prefs_update);
+	connect_callback(plugin, pref_blist_size, size_prefs_update);
 
-	connect_callback(pref_conv_show_add,    conv_buttons_set_all);
-	connect_callback(pref_conv_show_warn,   conv_buttons_set_all);
-	connect_callback(pref_conv_show_block,  conv_buttons_set_all);
-	connect_callback(pref_conv_show_file,   conv_buttons_set_all);
-	connect_callback(pref_conv_show_info,   conv_buttons_set_all);
-	connect_callback(pref_conv_show_invite, conv_buttons_set_all);
+#if !GAIM_VERSION_CHECK(2,0,0)
+	connect_callback(plugin, pref_conv_show_add,    conv_buttons_set_all);
+	connect_callback(plugin, pref_conv_show_warn,   conv_buttons_set_all);
+	connect_callback(plugin, pref_conv_show_block,  conv_buttons_set_all);
+	connect_callback(plugin, pref_conv_show_file,   conv_buttons_set_all);
+	connect_callback(plugin, pref_conv_show_info,   conv_buttons_set_all);
+	connect_callback(plugin, pref_conv_show_invite, conv_buttons_set_all);
+#endif
 
-	connect_callback(pref_blist_taskbar,      blist_taskbar_update);
-	connect_callback(pref_blist_allow_shrink, blist_shrink_update);
+	connect_callback(plugin, pref_blist_taskbar,      blist_taskbar_update);
+	connect_callback(plugin, pref_blist_allow_shrink, blist_shrink_update);
 
 	return TRUE;
 }
@@ -422,7 +443,11 @@ plugin_unload(GaimPlugin *plugin) {
 		GTK_WINDOW(gtkblist->window)->allow_shrink = FALSE;
 	}
 
+
+#if !GAIM_VERSION_CHECK(2,0,0)
+	g_list_foreach(pref_callbacks, (GFunc)gaim_prefs_disconnect_callback, NULL);
 	conv_prefs_clear_all();
+#endif
 	size_prefs_clear_all();
 
 	return TRUE;
@@ -474,15 +499,19 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
-	if (!gtk_check_version(2, 4, 0)) {
-		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nbesides the buddy list for font changes to take effect.");
-	} else {
+	if (gtk_check_version(2, 4, 0)) {
 		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nfor font changes to take effect.");
+		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+#if !GAIM_VERSION_CHECK(2,0,0)
+	} else {
+		label = gtk_label_new_with_mnemonic("You must close and reopen any affected windows\nbesides the buddy list for font changes to take effect.");
+		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+#endif
 	}
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 
 	vbox = gaim_gtk_make_frame (ret, "Conversations");
 
+#if !GAIM_VERSION_CHECK(2,0,0)
 	gaim_gtk_prefs_checkbox("Show _Add/Remove button in IMs and chats",
 							pref_conv_show_add, vbox);
 
@@ -500,6 +529,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	gaim_gtk_prefs_checkbox("Show _Invite button in chats",
 							pref_conv_show_invite, vbox);
+#endif
 
 	gaim_gtk_prefs_checkbox("Show _join and part messages in chats",
 							pref_conv_show_joinpart, vbox);
@@ -564,12 +594,14 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_none("/plugins/gtk/kstange");
 	gaim_prefs_add_none("/plugins/gtk/kstange/extendedprefs");
 	gaim_prefs_add_none("/plugins/gtk/kstange/extendedprefs/conv_buttons");
+#if !GAIM_VERSION_CHECK(2,0,0)
 	gaim_prefs_add_bool(pref_conv_show_warn, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_block, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_file, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_add, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_info, TRUE);
 	gaim_prefs_add_bool(pref_conv_show_invite, TRUE);
+#endif
 	gaim_prefs_add_bool(pref_conv_show_joinpart, TRUE);
 	gaim_prefs_add_int(pref_conv_size, 8);
 	gaim_prefs_add_int(pref_popup_size, 8);
