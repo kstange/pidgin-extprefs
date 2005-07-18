@@ -33,7 +33,7 @@ CFLAGS="$CFLAGS_save"
 AC_ARG_ENABLE(debug,   [  --enable-debug          compile with debugging support],,enable_debug=no)
 
 if test "x$enable_debug" = "xyes" ; then
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -DG_DISABLE_DEPRECATED -DGDK_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED"
+	DEBUG_CFLAGS="$DEBUG_CFLAGS"
 	AC_DEFINE(DEBUG, 1, [Define if debugging is enabled.])
 fi
 
