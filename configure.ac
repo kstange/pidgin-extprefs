@@ -60,13 +60,13 @@ AC_SUBST(GAIM_CFLAGS)
 #
 
 #AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([
-#*** GLib 2.0 is required to build gaim-snpp; please make sure you have
+#*** GLib 2.0 is required to build gaim-extprefs; please make sure you have
 #*** the GLib development headers installed. The latest version of GLib is 
 #*** always available at http://www.gtk.org/.]))
 #AC_SUBST(GLIB_CFLAGS)
 
 AM_PATH_GTK_2_0(2.0.0,,AC_MSG_ERROR([
-*** GTK+ 2.0 is required to build gaim-snpp; please make sure you have
+*** GTK+ 2.0 is required to build gaim-extprefs; please make sure you have
 *** the GTK+ development headers installed. The latest version of GTK+ is 
 *** always available at http://www.gtk.org/.]))
 AC_SUBST(GTK_CFLAGS)
