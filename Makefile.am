@@ -4,6 +4,7 @@ EXTRA_DIST =                 \
 	INSTALL-win32.txt    \
 	LICENSE              \
 	Makefile.mingw       \
+	TODO                 \
 	VERSION              \
 	src/Makefile.mingw
 

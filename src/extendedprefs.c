@@ -193,7 +193,6 @@ static void
 size_prefs_clear_all() {
 	size_set("gaim_gtkconv_entry", 0);
 	size_set("gaim_gtkconv_imhtml", 0);
-	resize_imhtml_fonts();
 	size_set("gaim_gtkrequest_imhtml", 0);
 	size_set("gaim_gtknotify_imhtml", 0);
 	size_set("gaim_gtklog_imhtml", 0);
@@ -201,6 +200,7 @@ size_prefs_clear_all() {
 	size_set("gaim_gtkblist_treeview", 0);
 
 	reset_theme();
+	resize_imhtml_fonts();
 }
 
 #if !GAIM_VERSION_CHECK(2,0,0)

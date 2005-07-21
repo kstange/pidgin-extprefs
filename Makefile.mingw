@@ -22,7 +22,8 @@ EP_SRC =		./src
 
 BIN_DIST =	ChangeLog \
 			INSTALL-win32.txt \
-			LICENSE
+			LICENSE \
+			TODO
 
 VERSION = $(shell cat ./VERSION)
 

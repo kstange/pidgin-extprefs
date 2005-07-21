@@ -1,5 +1,9 @@
 Gaim Extended Preferences Plugin
 
+Version 0.6:
+	* Unloading the plugin now resets the font sizes to theme defaults
+	  without the user having to close and reopen conversations.
+
 Version 0.5 (07/18/2005):
 	* Fixed the bugs which prevented the buddy list shrink and taskbar
 	  entry preferences from being honored at load time.
