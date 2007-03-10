@@ -1,5 +1,5 @@
 #
-# Gaim Extended Preferences Plugin Source Makefile (Win32-MinGW)
+#t Gaim Extended Preferences Plugin Source Makefile (Win32-MinGW)
 #
 # Copyright 2004 Kevin Stange <extprefs@simguy.net>
 #
@@ -23,9 +23,7 @@ ifeq "$(PREFIX)" ""
 endif
 
 EP_TOP   =		../
-GTK_TOP  =		../../../../win32-dev/gtk_2_0
-GAIM_TOP =		../../..
-DLL_INSTALL_DIR  =	$(PREFIX)/plugins
+GAIM_TOP =		../../../..
 
 EP = extprefs
 EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
@@ -37,7 +35,7 @@ DLL_LD_FLAGS =
 DEFINES = -DEP_VERSION=\"$(EP_VERSION)\"
 
 # We need some Gaim makefile information
-include $(GAIM_TOP)/src/win32/global.mak
+include $(GAIM_TOP)/libgaim/win32/global.mak
 
 INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include \
@@ -47,13 +45,16 @@ INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include/atk-1.0 \
 			-I$(GTK_TOP)/lib/glib-2.0/include \
 			-I$(GTK_TOP)/lib/gtk-2.0/include \
-			-I$(GAIM_TOP)/src \
-			-I$(GAIM_TOP)/src/win32 \
-			-I$(GAIM_TOP)
+			-I$(GAIM_TOP) \
+			-I$(GAIM_LIB_TOP) \
+			-I$(GAIM_LIB_TOP)/win32 \
+			-I$(GAIM_GTK_TOP) \
+			-I$(GAIM_GTK_TOP)/win32
 
 
 LIB_PATHS =		-L$(GTK_TOP)/lib \
-			-L$(GAIM_TOP)/src
+			-L$(GAIM_LIB_TOP) \
+			-L$(GAIM_GTK_TOP)
 
 EP_SRC =	extendedprefs.c
 
@@ -69,7 +70,8 @@ PLUGIN_LIBS = \
 	-lgobject-2.0 \
 	-lws2_32 \
 	-lintl \
-	-lgaim
+	-lgaim \
+	-lgtkgaim
 
 %.o: %.c
 	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
@@ -79,17 +81,16 @@ PLUGIN_LIBS = \
 
 all: $(EP).dll
 
-install: all
-	mkdir -p "$(DLL_INSTALL_DIR)"
-	cp $(EP).dll "$(DLL_INSTALL_DIR)"
+install: all $(GAIM_INSTALL_PLUGINS_DIR)
+	cp $(EP).dll "$(GAIM_INSTALL_PLUGINS_DIR)"
 
 
 # We need Gaim!!  Make it if we don't have it.
-$(GAIM_TOP)/src/gaim.lib:
+$(GAIM_TOP)/libgaim/gaim.lib:
 	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
-	$(MAKE) -C $(GAIM_TOP)/src -f Makefile.mingw gaim.lib
+	$(MAKE) -C $(GAIM_TOP)/libgaim -f Makefile.mingw
 
-$(EP).dll: $(EP_OBJ) $(GAIM_TOP)/src/gaim.lib
+$(EP).dll: $(EP_OBJ) $(GAIM_TOP)/libgaim
 	$(CC) -shared $(EP_OBJ) $(LIB_PATHS) $(PLUGIN_LIBS) $(DLL_LD_FLAGS) -o $(EP).dll
 
 clean:
