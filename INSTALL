@@ -14,7 +14,7 @@ Extract Gaim source somehow, somewhere, in an appropriate build environment.
 The WinGaim Build Fetcher <http://gaim-extprefs.sourceforge.net/bef.shtml>
 might be able to help you with this task.
 
-Extract the source tarball to the plugins/ directory of the gaim source and
+Extract the source tarball to the gtk/plugins/ directory of the gaim source and
 cd to the extracted directory:
 
 	tar -xzf gaim-extprefs-VERSION.tar.gz
