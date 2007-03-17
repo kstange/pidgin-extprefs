@@ -286,13 +286,13 @@ plugin_load(GaimPlugin *plugin) {
 	size_prefs_init_all();
 
 	/* Connect the preference callbacks we want to use. */
-	connect_callback(plugin, pref_conv_size,  size_prefs_update);
-	connect_callback(plugin, pref_log_size,   size_prefs_update);
-	connect_callback(plugin, pref_popup_size, size_prefs_update);
-	connect_callback(plugin, pref_blist_size, size_prefs_update);
+	connect_callback(plugin, pref_conv_size,  (GaimPrefCallback)size_prefs_update);
+	connect_callback(plugin, pref_log_size,   (GaimPrefCallback)size_prefs_update);
+	connect_callback(plugin, pref_popup_size, (GaimPrefCallback)size_prefs_update);
+	connect_callback(plugin, pref_blist_size, (GaimPrefCallback)size_prefs_update);
 
-	connect_callback(plugin, pref_blist_taskbar,      blist_taskbar_update);
-	connect_callback(plugin, pref_blist_allow_shrink, blist_shrink_update);
+	connect_callback(plugin, pref_blist_taskbar,      (GaimPrefCallback)blist_taskbar_update);
+	connect_callback(plugin, pref_blist_allow_shrink, (GaimPrefCallback)blist_shrink_update);
 
 	return TRUE;
 }
@@ -395,7 +395,8 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 static GaimGtkPluginUiInfo ui_info =
 {
-	get_config_frame
+	get_config_frame,   /* UI config frame */
+	0                   /* page_num */
 };
 
 static GaimPluginInfo info =
