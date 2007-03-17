@@ -1,6 +1,9 @@
 Gaim Extended Preferences Plugin
 
 Version 0.6:
+	* Gaim 1.x.y compatibility has been removed from the plugin. Gaim
+	  2.0.x will be required in order to build or load this and all
+	  future releases.
 	* Unloading the plugin now resets the font sizes to theme defaults
 	  without the user having to close and reopen conversations.
 
