@@ -408,8 +408,12 @@ static GaimPluginInfo info =
 	KSTANGE_EP_PLUGIN_ID,
 	"Extended Preferences",
 	EP_VERSION,
-	"Extended preferences not officially supported by Gaim.",
-	"Provides several extended preferences for Gaim users.  These were omitted from Gaim for various reasons, but were popular requests from Gaim users.\n\nNote: This plugin is not supported by the official Gaim project.  Do not bug the developers about this plugin!",
+	"Provides a number of additional preferences to Gaim user.",
+	"This plugin provides a number of different preferences that were "
+	"either rejected for or removed from Gaim.  It was originally "
+	"created to provide Windows users with a way to make the text "
+	"inside their conversation windows larger, but now performs a "
+	"number of other functions.",
 	"Kevin Stange <extprefs@simguy.net>",
 	"http://gaim-extprefs.sf.net/",
 	plugin_load,
