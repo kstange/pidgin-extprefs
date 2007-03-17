@@ -408,9 +408,9 @@ static GaimPluginInfo info =
 	KSTANGE_EP_PLUGIN_ID,
 	"Extended Preferences",
 	EP_VERSION,
-	"Provides a number of additional preferences to Gaim user.",
+	"Provides a number of additional preferences to Gaim users.",
 	"This plugin provides a number of different preferences that were "
-	"either rejected for or removed from Gaim.  It was originally "
+	"either rejected or \"slashed\" from Gaim.  It was originally "
 	"created to provide Windows users with a way to make the text "
 	"inside their conversation windows larger, but now performs a "
 	"number of other functions.",
