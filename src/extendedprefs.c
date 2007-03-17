@@ -120,9 +120,7 @@ reset_theme() {
 
 	if (!gtk_check_version(2, 4, 0)) {
 		GModule *module = g_module_open(NULL, 0);
-		/* Additional variable needed to fix warning: 
-		   dereferencing type-punned pointer will break strict-aliasing rules */
-		gpointer prc_reset_function;
+		gpointer prc_reset_function = NULL;
 		void (*rc_reset_function) (GtkSettings * settings) = NULL;
 
 		if(module) {
@@ -330,35 +328,30 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	sg = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
-	/* XXX: These spinbutton functions are supposed to be taking
-	 *      const char *, but they were originally written with char *.
-	 *      This will be fixed in Gaim 2.0.0.
-	 */
-
 	/* Conversations */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "_Conversations:",
-									   (char *)pref_conv_size,
+									   pref_conv_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
 	/* Log Viewer Size */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "Log _Viewer:",
-									   (char *)pref_log_size,
+									   pref_log_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
 	/* Popup Dialogs */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "Information _Dialogs:",
-									   (char *)pref_popup_size,
+									   pref_popup_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
 
 	/* Buddy List Size */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "Budd_y List:",
-									   (char *)pref_blist_size,
+									   pref_blist_size,
 									   KSTANGE_EP_SIZE_MIN,
 									   KSTANGE_EP_SIZE_MAX,
 									   sg);
@@ -377,7 +370,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 
 	/* Tooltip Delay */
 	gaim_gtk_prefs_labeled_spin_button(vbox, "_Tooltip reveal delay (ms):",
-									   (char *)pref_tooltip_delay,
+									   pref_tooltip_delay,
 									   KSTANGE_EP_BLIST_TIP_MIN,
 									   KSTANGE_EP_BLIST_TIP_MAX,
 									   NULL);
