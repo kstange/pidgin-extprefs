@@ -86,11 +86,11 @@ install: all $(GAIM_INSTALL_PLUGINS_DIR)
 
 
 # We need Gaim!!  Make it if we don't have it.
-$(GAIM_TOP)/libgaim/gaim.lib:
+$(GAIM_TOP)/gtk/gtkgaim.dll.a:
 	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
-	$(MAKE) -C $(GAIM_TOP)/libgaim -f Makefile.mingw
+	$(MAKE) -C $(GAIM_TOP)/gtk -f Makefile.mingw
 
-$(EP).dll: $(EP_OBJ) $(GAIM_TOP)/libgaim
+$(EP).dll: $(EP_OBJ) $(GAIM_TOP)/gtk/gtkgaim.dll.a
 	$(CC) -shared $(EP_OBJ) $(LIB_PATHS) $(PLUGIN_LIBS) $(DLL_LD_FLAGS) -o $(EP).dll
 
 clean:
