@@ -120,11 +120,14 @@ reset_theme() {
 
 	if (!gtk_check_version(2, 4, 0)) {
 		GModule *module = g_module_open(NULL, 0);
+		/* Additional variable needed to fix warning: 
+		   dereferencing type-punned pointer will break strict-aliasing rules */
+		gpointer prc_reset_function;
 		void (*rc_reset_function) (GtkSettings * settings) = NULL;
 
 		if(module) {
-			g_module_symbol (module, "gtk_rc_reset_styles",
-							 (gpointer *)(&rc_reset_function));
+			g_module_symbol (module, "gtk_rc_reset_styles", &prc_reset_function);
+			rc_reset_function = prc_reset_function;
 			(*rc_reset_function)(gtk_settings_get_default());
 			g_module_close(module);
 		}
