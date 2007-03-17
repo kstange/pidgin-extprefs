@@ -7,6 +7,7 @@ config.log
 config.status
 config.sub
 configure
+depcomp
 pre_config.h
 pre_config.h.in
 extprefs_config.h
@@ -15,6 +16,7 @@ libtool
 ltmain.sh
 missing
 mkinstalldirs
+stamp-h1
 *.tar.gz
 *.zip
 *.patch
