@@ -73,8 +73,7 @@ PLUGIN_LIBS = \
 	-lgaim \
 	-lgtkgaim
 
-%.o: %.c
-	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
+%.o: %.c $(GAIM_TOP)/config.h
 	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(DEFINES) -c $< -o $@
 
 .PHONY: all clean install
@@ -85,9 +84,11 @@ install: all $(GAIM_INSTALL_PLUGINS_DIR)
 	cp $(EP).dll "$(GAIM_INSTALL_PLUGINS_DIR)"
 
 
-# We need Gaim!!  Make it if we don't have it.
-$(GAIM_TOP)/gtk/gtkgaim.dll.a:
+# We need GtkGaim!!  Make it if we don't have it.
+$(GAIM_TOP)/config.h:
 	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
+
+$(GAIM_TOP)/gtk/gtkgaim.dll.a: $(GAIM_TOP)/config.h
 	$(MAKE) -C $(GAIM_TOP)/gtk -f Makefile.mingw
 
 $(EP).dll: $(EP_OBJ) $(GAIM_TOP)/gtk/gtkgaim.dll.a

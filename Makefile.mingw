@@ -18,12 +18,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-EP_SRC =		./src
+EP_SRC =	./src
 
 BIN_DIST =	ChangeLog \
-			INSTALL-win32.txt \
-			LICENSE \
-			TODO
+		INSTALL-win32.txt \
+		LICENSE \
+		TODO
 
 VERSION = $(shell cat ./VERSION)
 
