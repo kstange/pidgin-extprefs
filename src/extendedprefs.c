@@ -61,10 +61,14 @@ static const char *pref_log_size         = "/plugins/gtk/kstange/extendedprefs/l
 static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/blist_size";
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
 static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
+static const char *pref_blist_tooltip		= "/plugins/gtk/kstange/extendedprefs/blist_tooltip";
 
 static gdouble _point_sizes [] = { .69444444, .8333333, 1, 1.2, 1.44, 1.728, 2.0736};
 
 static gboolean logging_in = FALSE;
+
+// Callback ids
+static guint blist_tooltip_cbid = 0;
 
 static void
 size_set(const char *widget, int value) {
@@ -270,6 +274,27 @@ connect_callback(GaimPlugin *plugin, const char *pref, GaimPrefCallback function
 	gaim_prefs_connect_callback(plugin, pref, function, NULL);
 }
 
+// Callback showing the tooltip and tooltip reveal time
+static void
+blist_tooltip_update(const char *name, GaimPrefType type, gconstpointer value, gpointer data) {
+	GtkWidget *widget = data;
+	GList *spin_button;
+	gint reveal_delay;
+
+	if (gaim_prefs_get_bool(name)) {	
+		spin_button = g_list_last(gtk_container_get_children(widget))->data;
+		reveal_delay = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spin_button));
+		gaim_prefs_set_int(pref_tooltip_delay, reveal_delay);
+		gtk_spin_button_set_value(spin_button, reveal_delay);
+		gtk_widget_set_sensitive(GTK_WIDGET(widget), TRUE);
+	}
+	else {
+		gtk_widget_set_sensitive(GTK_WIDGET(widget), FALSE);
+		gaim_prefs_set_int(pref_tooltip_delay, KSTANGE_EP_BLIST_TIP_MIN);
+	}
+}
+
+
 static gboolean
 plugin_load(GaimPlugin *plugin) {
 	GaimGtkBuddyList *gtkblist = GAIM_GTK_BLIST(gaim_get_blist());
@@ -316,13 +341,23 @@ plugin_unload(GaimPlugin *plugin) {
 }
 
 static GtkWidget* get_config_frame(GaimPlugin *plugin) {
-	GtkWidget *ret;
+	GtkWidget *ret, *hbox, *reveal_delay_widget, *nb;
 	GtkWidget *vbox;
+	GtkWidget *tab_label1, *tab_label2, *page2;
 	GtkWidget *label;
 	GtkSizeGroup *sg;
 
+	gaim_prefs_disconnect_callback(blist_tooltip_cbid);
+	nb = gtk_notebook_new();
 	ret = gtk_vbox_new(FALSE, 18);
+	tab_label1 = gtk_label_new("General");
+	tab_label2 = gtk_label_new("Accels");
+	page2 = gtk_vbox_new(FALSE, 18);
+	gtk_notebook_append_page(nb, ret, tab_label1);
+	gtk_notebook_append_page(nb, page2, tab_label2);
+
 	gtk_container_set_border_width (GTK_CONTAINER (ret), 12);
+	gtk_container_set_border_width (GTK_CONTAINER(page2), 12);
 
 	vbox = gaim_gtk_make_frame (ret, "Interface Font Sizes (points)");
 
@@ -369,11 +404,17 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 	vbox = gaim_gtk_make_frame (ret, "Buddy List");
 
 	/* Tooltip Delay */
-	gaim_gtk_prefs_labeled_spin_button(vbox, "_Tooltip reveal delay (ms):",
-									   pref_tooltip_delay,
-									   KSTANGE_EP_BLIST_TIP_MIN,
-									   KSTANGE_EP_BLIST_TIP_MAX,
-									   NULL);
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(vbox, hbox, FALSE, FALSE, 0);
+	gaim_gtk_prefs_checkbox("Show buddy _tooltip:", pref_blist_tooltip, hbox);
+	reveal_delay_widget = gaim_gtk_prefs_labeled_spin_button(hbox, "Reveal delay (ms):",
+										pref_tooltip_delay,
+										KSTANGE_EP_BLIST_TIP_MIN,
+										KSTANGE_EP_BLIST_TIP_MAX,
+										NULL);
+	gtk_widget_set_sensitive(GTK_WIDGET(reveal_delay_widget), gaim_prefs_get_bool(pref_blist_tooltip));
+	blist_tooltip_cbid = gaim_prefs_connect_callback(plugin, pref_blist_tooltip, 
+									blist_tooltip_update, reveal_delay_widget);
 
 	/* Window Widget Tweaking Prefs */
 	gaim_gtk_prefs_checkbox("Show buddy _list entry in taskbar",
@@ -386,7 +427,7 @@ static GtkWidget* get_config_frame(GaimPlugin *plugin) {
 							pref_blist_allow_shrink, vbox);
 
 	gtk_widget_show_all(ret);
-	return ret;
+	return nb;
 }
 
 static GaimGtkPluginUiInfo ui_info =
@@ -439,7 +480,8 @@ init_plugin(GaimPlugin *plugin)
 	gaim_prefs_add_bool(pref_blist_taskbar, TRUE);
 	gaim_prefs_add_bool(pref_blist_allow_shrink, FALSE);
 	gaim_prefs_add_bool(pref_blist_autohide, FALSE);
-
+	gaim_prefs_add_bool(pref_blist_tooltip, TRUE);
+	
 	if (gaim_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * gaim_prefs_get_int(pref_conv_zoom);
 		gaim_prefs_set_int(pref_conv_size,  floor(zoom));
