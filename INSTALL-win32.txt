@@ -14,6 +14,9 @@ the extprefs.dll file from the zip file to your Gaim user plugins folder:
 	Windows 2000/XP/2003:
 	c:\documents and settings\<username>\Application Data\.gaim\plugins
 
+	Windows Vista: 
+	C:\Users\<username>\AppData\Roaming\.gaim\plugins
+
 Note: Be sure to delete any older extendedprefs.dll file, as older versions
 of this plugin had a different filename.
 
