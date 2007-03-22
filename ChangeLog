@@ -1,5 +1,9 @@
 Gaim Extended Preferences Plugin
 
+Version 0.7:
+	* Changed the tooltip preference to include an on/off checkbox
+	  to make it clearer how to disable the tooltip.
+
 Version 0.6 (03/22/2007):
 	* Gaim 1.x.y compatibility has been removed from the plugin. Gaim
 	  2.0.x will be required in order to build or load this and all

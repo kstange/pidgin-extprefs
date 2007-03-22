@@ -1,14 +1,9 @@
 To Do for Gaim Extended Preferences
 =====================================
 
-[ Will Happen Soon ]
+Planned:
 
-* Convert the existing UI into a GtkNotebook separating different categories.
-
-* Provide a function to restore certain buttons to the conversation window;
-  particularly the Get Info button and the Add/Remove button (in HEAD).
-
-[ Still Considering Viability ]
+Under Consideration:
 
 * Trillian style offline buddies group in the buddy list.  Is this even
   technically possible given the API?
