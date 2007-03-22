@@ -40,8 +40,14 @@ directory:
 	c:\windows\Application Data\.gaim\plugins (default user)
 	c:\windows\profiles\<username>\Application Data\.gaim\plugins
 
-	Windows 2000/XP:
+	Windows NT 4.0:
+	c:\winnt\profiles\<username>\Application Data\.gaim\plugins
+
+	Windows 2000/XP/2003:
 	c:\documents and settings\<username>\Application Data\.gaim\plugins
+
+	Windows Vista:
+	C:\Users\<username>\AppData\Roaming\.gaim\plugins
 
 Then simply start or restart Gaim and load the plugin from the Gaim
 preferences dialog.
