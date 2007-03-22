@@ -1,1 +1,21 @@
-See ChangeLog
+Gaim Extended Preferences Plugin
+
+Version 0.6 (03/22/2007):
+
+   This is the first release in very nearly two years.  Development for me
+   has basically been at a standstill, mostly because of lack of time, and
+   because while Gaim is extremely happily alive, it has been stuck without
+   a "real" release for some time and has felt a bit like a moving target.
+   This release is to help satisfy many people on Windows that are waiting
+   for me to finally release ANYTHING they can install and use.  It also
+   makes the plugin fully API compatible with 2.0.0 beta 6 (which should
+   be API frozen now for release, I hope) and discontinue support for
+   1.5.0, which you simply shouldn't be using anymore.  No new features
+   will be found in this release, but the plugin should compile properly on
+   2.0.0 beta 6, and better in general elsewhere.
+
+   Also, a warm welcome to Craig Harding, who offered his contributions and
+   I have accepted as an official developer of the plugin.  He has some
+   ideas for improvements and changes which will certainly appear in the
+   next release, 0.7, which we will do our best to deliver in fewer than
+   20 months. :)
