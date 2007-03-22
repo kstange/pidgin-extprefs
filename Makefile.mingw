@@ -35,6 +35,7 @@ install: all
 
 zip: all
 	cp src/extprefs.dll ./
+	strip --strip-unneeded extprefs.dll
 	zip -qD gaim-extprefs-$(VERSION).zip $(BIN_DIST) extprefs.dll
 	rm -f extprefs.dll
 
