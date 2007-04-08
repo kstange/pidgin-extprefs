@@ -1,5 +1,5 @@
 #
-# Gaim Extended Preferences Plugin Win32 Makefile
+# Pidgin Extended Preferences Plugin Win32 Makefile
 #
 # Copyright 2004 Kevin Stange <extprefs@simguy.net>
 #
@@ -36,10 +36,10 @@ install: all
 zip: all
 	cp src/extprefs.dll ./
 	strip --strip-unneeded extprefs.dll
-	rm -f gaim-extprefs-$(VERSION).zip
-	zip -qD gaim-extprefs-$(VERSION).zip $(BIN_DIST) extprefs.dll
+	rm -f pidgin-extprefs-$(VERSION).zip
+	zip -qD pidgin-extprefs-$(VERSION).zip $(BIN_DIST) extprefs.dll
 	rm -f extprefs.dll
 
 clean:
 	$(MAKE) -C $(EP_SRC) -f Makefile.mingw clean
-	rm -f gaim-extprefs-*.zip
+	rm -f pidgin-extprefs-*.zip

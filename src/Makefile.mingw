@@ -1,5 +1,5 @@
 #
-#t Gaim Extended Preferences Plugin Source Makefile (Win32-MinGW)
+#t Pidgin Extended Preferences Plugin Source Makefile (Win32-MinGW)
 #
 # Copyright 2004 Kevin Stange <extprefs@simguy.net>
 #
@@ -18,12 +18,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-ifeq "$(PREFIX)" ""
-  PREFIX = $(GAIM_TOP)/win32-install-dir
-endif
-
 EP_TOP   =		../
-GAIM_TOP =		../../../..
+SOURCE_TOP =		../../../..
 
 EP = extprefs
 EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
@@ -34,8 +30,8 @@ DLL_LD_FLAGS =
 
 DEFINES = -DEP_VERSION=\"$(EP_VERSION)\"
 
-# We need some Gaim makefile information
-include $(GAIM_TOP)/libgaim/win32/global.mak
+# We need some Pidgin/Purple makefile information
+include $(SOURCE_TOP)/libpurple/win32/global.mak
 
 INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include \
@@ -45,16 +41,16 @@ INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include/atk-1.0 \
 			-I$(GTK_TOP)/lib/glib-2.0/include \
 			-I$(GTK_TOP)/lib/gtk-2.0/include \
-			-I$(GAIM_TOP) \
-			-I$(GAIM_LIB_TOP) \
-			-I$(GAIM_LIB_TOP)/win32 \
-			-I$(GAIM_GTK_TOP) \
-			-I$(GAIM_GTK_TOP)/win32
+			-I$(SOURCE_TOP) \
+			-I$(PURPLE_TOP) \
+			-I$(PURPLE_TOP)/win32 \
+			-I$(PIDGIN_TOP) \
+			-I$(PIDGIN_TOP)/win32
 
 
 LIB_PATHS =		-L$(GTK_TOP)/lib \
-			-L$(GAIM_LIB_TOP) \
-			-L$(GAIM_GTK_TOP)
+			-L$(PURPLE_TOP) \
+			-L$(PIDGIN_TOP)
 
 EP_SRC =	extendedprefs.c
 
@@ -70,28 +66,28 @@ PLUGIN_LIBS = \
 	-lgobject-2.0 \
 	-lws2_32 \
 	-lintl \
-	-lgaim \
-	-lgtkgaim
+	-lpidgin \
+	-lpurple
 
-%.o: %.c $(GAIM_TOP)/config.h
+%.o: %.c $(SOURCE_TOP)/config.h
 	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(DEFINES) -c $< -o $@
 
 .PHONY: all clean install
 
 all: $(EP).dll
 
-install: all $(GAIM_INSTALL_PLUGINS_DIR)
-	cp $(EP).dll "$(GAIM_INSTALL_PLUGINS_DIR)"
+install: all $(PIDGIN_INSTALL_PLUGINS_DIR)
+	cp $(EP).dll "$(PIDGIN_INSTALL_PLUGINS_DIR)"
 
 
-# We need GtkGaim!!  Make it if we don't have it.
-$(GAIM_TOP)/config.h:
-	cp $(GAIM_TOP)/config.h.mingw $(GAIM_TOP)/config.h
+# We need GtkPidgin!!  Make it if we don't have it.
+$(SOURCE_TOP)/config.h:
+	cp $(SOURCE_TOP)/config.h.mingw $(SOURCE_TOP)/config.h
 
-$(GAIM_TOP)/gtk/gtkgaim.dll.a: $(GAIM_TOP)/config.h
-	$(MAKE) -C $(GAIM_TOP)/gtk -f Makefile.mingw
+$(PIDGIN_TOP)/pidgin.dll.a: $(SOURCE_TOP)/config.h
+	$(MAKE) -C $(PIDGIN_TOP) -f Makefile.mingw
 
-$(EP).dll: $(EP_OBJ) $(GAIM_TOP)/gtk/gtkgaim.dll.a
+$(EP).dll: $(EP_OBJ) $(PIDGIN_TOP)/gtkpidgin.dll.a
 	$(CC) -shared $(EP_OBJ) $(LIB_PATHS) $(PLUGIN_LIBS) $(DLL_LD_FLAGS) -o $(EP).dll
 
 clean:

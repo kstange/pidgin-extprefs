@@ -1,14 +1,14 @@
 #
-# Most of this configure script was ripped from gaim or the
-# gaim-encryption configure script, thanks guys ;)
+# Most of this configure script was ripped from pidgin or the
+# pidgin-encryption configure script, thanks guys ;)
 #
 
 AC_INIT(src/extendedprefs.c)
 AC_PREREQ([2.50])
 
 EXTPREFS_VERSION="`cat ./VERSION`"
-AM_INIT_AUTOMAKE([gaim-extprefs], $EXTPREFS_VERSION, 'no-define')
-AC_DEFINE_UNQUOTED(EXTPREFS_VERSION, "$EXTPREFS_VERSION", [Gaim-ExtPrefs Version])
+AM_INIT_AUTOMAKE([pidgin-extprefs], $EXTPREFS_VERSION, 'no-define')
+AC_DEFINE_UNQUOTED(EXTPREFS_VERSION, "$EXTPREFS_VERSION", [pidgin-extprefs Version])
 
 AC_PATH_PROG(sedpath, sed)
 #
@@ -45,28 +45,33 @@ fi
 AC_SUBST(CFLAGS)
 
 #
-# Check for Gaim
+# Check for Pidgin
 #
 
-PKG_CHECK_MODULES(GAIM, gaim,
+PKG_CHECK_MODULES(PURPLE, purple >= 2.0.0,
 [
-   AC_DEFINE(HAVE_GAIM, 1, [Define if we've found gaim.])
+   AC_DEFINE(HAVE_PURPLE, 1, [Define if we've found purple.])
+])
+PKG_CHECK_MODULES(PIDGIN, pidgin >= 2.0.0,
+[
+   AC_DEFINE(HAVE_PIDGIN, 1, [Define if we've found pidgin.])
 ])
 
-AC_SUBST(GAIM_CFLAGS)
+AC_SUBST(PURPLE_CFLAGS)
+AC_SUBST(PIDGIN_CFLAGS)
 
 #
-# check for gtk and other dependencies
+# check for GTK+ and glib
 #
 
-#AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([
-#*** GLib 2.0 is required to build gaim-extprefs; please make sure you have
-#*** the GLib development headers installed. The latest version of GLib is 
-#*** always available at http://www.gtk.org/.]))
-#AC_SUBST(GLIB_CFLAGS)
+AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([
+*** GLib 2.0 is required to build pidgin-extprefs; please make sure you have
+*** the GLib development headers installed. The latest version of GLib is 
+*** always available at http://www.gtk.org/.]))
+AC_SUBST(GLIB_CFLAGS)
 
 AM_PATH_GTK_2_0(2.0.0,,AC_MSG_ERROR([
-*** GTK+ 2.0 is required to build gaim-extprefs; please make sure you have
+*** GTK+ 2.0 is required to build pidgin-extprefs; please make sure you have
 *** the GTK+ development headers installed. The latest version of GTK+ is 
 *** always available at http://www.gtk.org/.]))
 AC_SUBST(GTK_CFLAGS)

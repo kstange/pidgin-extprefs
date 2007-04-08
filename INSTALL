@@ -1,30 +1,30 @@
-Gaim Extended Preferences Plugin Installation
+Pidgin Extended Preferences Plugin Installation
 ==========================================================
 
 Installation of this plugin varies by platform.  Please follow the
 appropriate directions below for your platform.
 
-For reference, any time "gaim-extprefs-VERSION" is mentioned, you should
+For reference, any time "pidgin-extprefs-VERSION" is mentioned, you should
 replace "VERSION" with the current version of the plugin, such as "0.5"
 
 Windows Installation
 ====================
 
-Extract Gaim source somehow, somewhere, in an appropriate build environment.
-The WinGaim Build Fetcher <http://gaim-extprefs.sourceforge.net/bef.shtml>
+Extract Pidgin source somehow, somewhere, in an appropriate build environment.
+The WinPidgin Build Fetcher <http://gaim-extprefs.sourceforge.net/bef.shtml>
 might be able to help you with this task.
 
-Extract the source tarball to the gtk/plugins/ directory of the gaim source and
+Extract the source tarball to the gtk/plugins/ directory of the pidgin source and
 cd to the extracted directory:
 
-	tar -xzf gaim-extprefs-VERSION.tar.gz
-	cd gaim-extprefs-VERSION/
+	tar -xzf pidgin-extprefs-VERSION.tar.gz
+	cd pidgin-extprefs-VERSION/
 
 To build the plugin, type:
 
 	make -f Makefile.mingw
 
-If necessary, Gaim's source should be built automatically as it is required
+If necessary, Pidgin's source should be built automatically as it is required
 to install plugins.
 
 Once this is complete, you can install the plugin to the win32-install-dir
@@ -32,24 +32,24 @@ directory, which is usually used for building packages by typing:
 
 	make -f Makefile.mingw install
 
-If you'd rather just use the plugin with your regular Gaim installation,
+If you'd rather just use the plugin with your regular Pidgin installation,
 copy the extprefs.dll file from the src/ subdirectory to your user plugins
 directory:
 
 	Windows 98/Me:
-	c:\windows\Application Data\.gaim\plugins (default user)
-	c:\windows\profiles\<username>\Application Data\.gaim\plugins
+	c:\windows\Application Data\.pidgin\plugins (default user)
+	c:\windows\profiles\<username>\Application Data\.pidgin\plugins
 
 	Windows NT 4.0:
-	c:\winnt\profiles\<username>\Application Data\.gaim\plugins
+	c:\winnt\profiles\<username>\Application Data\.pidgin\plugins
 
 	Windows 2000/XP/2003:
-	c:\documents and settings\<username>\Application Data\.gaim\plugins
+	c:\documents and settings\<username>\Application Data\.pidgin\plugins
 
 	Windows Vista:
-	C:\Users\<username>\AppData\Roaming\.gaim\plugins
+	C:\Users\<username>\AppData\Roaming\.pidgin\plugins
 
-Then simply start or restart Gaim and load the plugin from the Gaim
+Then simply start or restart Pidgin and load the plugin from the Pidgin
 preferences dialog.
 
 Non-Windows Installation

@@ -1,5 +1,5 @@
 #! /bin/sh
-echo "Generating configuration files for Gaim-ExtPrefs, please wait...."
+echo "Generating configuration files for pidgin-extprefs, please wait...."
 echo;
 
 echo "Running libtoolize, please ignore non-fatal messages...."

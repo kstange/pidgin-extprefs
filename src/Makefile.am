@@ -1,4 +1,4 @@
-plugindir = $(libdir)/gaim
+plugindir = $(libdir)/pidgin
 
 libextprefs_la_LDFLAGS = -module -avoid-version
 
@@ -12,8 +12,9 @@ endif
 
 AM_CPPFLAGS = \
 	-DEP_VERSION=\"$(VERSION)\" \
-	-DLIBDIR=\"$(libdir)/gaim/\" \
+	-DLIBDIR=\"$(libdir)/pidgin/\" \
 	-DDATADIR=\"$(datadir)\" \
 	$(GTK_CFLAGS) \
-	$(GAIM_CFLAGS) \
+	$(PIDGIN_CFLAGS) \
+	$(PURPLE_CFLAGS) \
 	$(DEBUG_CFLAGS)
