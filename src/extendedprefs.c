@@ -141,19 +141,19 @@ size_prefs_init_all() {
 	int value;
 
 	value = purple_prefs_get_int(pref_conv_size);
-	size_set("pidginconv_entry", value);
-	size_set("pidginconv_imhtml", value);
-	size_set("pidginprefs_font_imhtml", value);
+	size_set("pidgin_conv_entry", value);
+	size_set("pidgin_conv_imhtml", value);
+	size_set("pidgin_prefs_font_imhtml", value);
 
 	value = purple_prefs_get_int(pref_popup_size);
-	size_set("pidginrequest_imhtml", value);
-	size_set("pidginnotify_imhtml", value);
+	size_set("pidgin_request_imhtml", value);
+	size_set("pidgin_notify_imhtml", value);
 
 	value = purple_prefs_get_int(pref_log_size);
 	size_set("pidginlog_imhtml", value);
 
 	value = purple_prefs_get_int(pref_blist_size);
-	size_set("pidginblist_treeview", value);
+	size_set("pidgin_blist_treeview", value);
 	reset_theme();
 	resize_imhtml_fonts();
 }
@@ -165,18 +165,18 @@ size_prefs_update(const char *pref, PurplePrefType type, gpointer val,
 	gint value = GPOINTER_TO_INT(val);
 
 	if (!strcmp(pref, pref_conv_size)) {
-		size_set("pidginconv_entry", value);
-		size_set("pidginconv_imhtml", value);
-		size_set("pidginprefs_font_imhtml", value);
+		size_set("pidgin_conv_entry", value);
+		size_set("pidgin_conv_imhtml", value);
+		size_set("pidgin_prefs_font_imhtml", value);
 	}
 	else if (!strcmp(pref, pref_popup_size)) {
-		size_set("pidginrequest_imhtml", value);
-		size_set("pidginnotify_imhtml", value);
+		size_set("pidgin_request_imhtml", value);
+		size_set("pidgin_notify_imhtml", value);
 	}
 	else if (!strcmp(pref, pref_log_size))
-		size_set("pidginlog_imhtml", value);
+		size_set("pidgin_log_imhtml", value);
 	else if (!strcmp(pref, pref_blist_size))
-		size_set("pidginblist_treeview", value);
+		size_set("pidgin_blist_treeview", value);
 
 	reset_theme();
 	resize_imhtml_fonts();
@@ -184,13 +184,13 @@ size_prefs_update(const char *pref, PurplePrefType type, gpointer val,
 
 static void
 size_prefs_clear_all() {
-	size_set("pidginconv_entry", 0);
-	size_set("pidginconv_imhtml", 0);
-	size_set("pidginrequest_imhtml", 0);
-	size_set("pidginnotify_imhtml", 0);
-	size_set("pidginlog_imhtml", 0);
-	size_set("pidginprefs_font_imhtml", 0);
-	size_set("pidginblist_treeview", 0);
+	size_set("pidgin_conv_entry", 0);
+	size_set("pidgin_conv_imhtml", 0);
+	size_set("pidgin_request_imhtml", 0);
+	size_set("pidgin_notify_imhtml", 0);
+	size_set("pidgin_log_imhtml", 0);
+	size_set("pidgin_prefs_font_imhtml", 0);
+	size_set("pidgin_blist_treeview", 0);
 
 	reset_theme();
 	resize_imhtml_fonts();

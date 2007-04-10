@@ -19,7 +19,7 @@
 #
 
 EP_TOP   =		../
-SOURCE_TOP =		../../../..
+PIDGIN_TREE_TOP =	../../../..
 
 EP = extprefs
 EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
@@ -31,7 +31,7 @@ DLL_LD_FLAGS =
 DEFINES = -DEP_VERSION=\"$(EP_VERSION)\"
 
 # We need some Pidgin/Purple makefile information
-include $(SOURCE_TOP)/libpurple/win32/global.mak
+include $(PIDGIN_TREE_TOP)/libpurple/win32/global.mak
 
 INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include \
@@ -41,7 +41,7 @@ INCLUDE_PATHS +=	-I. \
 			-I$(GTK_TOP)/include/atk-1.0 \
 			-I$(GTK_TOP)/lib/glib-2.0/include \
 			-I$(GTK_TOP)/lib/gtk-2.0/include \
-			-I$(SOURCE_TOP) \
+			-I$(PIDGIN_TREE_TOP) \
 			-I$(PURPLE_TOP) \
 			-I$(PURPLE_TOP)/win32 \
 			-I$(PIDGIN_TOP) \
@@ -69,7 +69,7 @@ PLUGIN_LIBS = \
 	-lpidgin \
 	-lpurple
 
-%.o: %.c $(SOURCE_TOP)/config.h
+%.o: %.c $(PIDGIN_CONFIG_H)
 	$(CC) $(CFLAGS) $(INCLUDE_PATHS) $(DEFINES) -c $< -o $@
 
 .PHONY: all clean install
@@ -80,14 +80,14 @@ install: all $(PIDGIN_INSTALL_PLUGINS_DIR)
 	cp $(EP).dll "$(PIDGIN_INSTALL_PLUGINS_DIR)"
 
 
-# We need GtkPidgin!!  Make it if we don't have it.
-$(SOURCE_TOP)/config.h:
-	cp $(SOURCE_TOP)/config.h.mingw $(SOURCE_TOP)/config.h
+# We need Pidgin!!  Make it if we don't have it.
+$(PIDGIN_CONFIG_H):
+	cp $(PIDGIN_CONFIG_H).mingw $(PIDGIN_CONFIG_H)
 
-$(PIDGIN_TOP)/pidgin.dll.a: $(SOURCE_TOP)/config.h
+$(PIDGIN_DLL).a: $(PIDGIN_CONFIG_H)
 	$(MAKE) -C $(PIDGIN_TOP) -f Makefile.mingw
 
-$(EP).dll: $(EP_OBJ) $(PIDGIN_TOP)/gtkpidgin.dll.a
+$(EP).dll: $(EP_OBJ) $(PIDGIN_DLL).a
 	$(CC) -shared $(EP_OBJ) $(LIB_PATHS) $(PLUGIN_LIBS) $(DLL_LD_FLAGS) -o $(EP).dll
 
 clean:
