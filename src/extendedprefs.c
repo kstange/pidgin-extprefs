@@ -150,7 +150,7 @@ size_prefs_init_all() {
 	size_set("pidgin_notify_imhtml", value);
 
 	value = purple_prefs_get_int(pref_log_size);
-	size_set("pidgin log_imhtml", value);
+	size_set("pidgin_log_imhtml", value);
 
 	value = purple_prefs_get_int(pref_blist_size);
 	size_set("pidgin_blist_treeview", value);
