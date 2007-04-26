@@ -245,13 +245,13 @@ static void
 blist_created_cb(PurpleBuddyList *blist, void *data) {
 	PidginBuddyList *gtkblist = PIDGIN_BLIST(blist);
 
-	blist_taskbar_update(NULL, 0, (gpointer)purple_prefs_get_bool(pref_blist_taskbar), NULL);
-	blist_shrink_update(NULL, 0, (gpointer)purple_prefs_get_bool(pref_blist_allow_shrink), NULL);
+	blist_taskbar_update(NULL, 0, GINT_TO_POINTER(purple_prefs_get_bool(pref_blist_taskbar)), NULL);
+	blist_shrink_update(NULL, 0, GINT_TO_POINTER(purple_prefs_get_bool(pref_blist_allow_shrink)), NULL);
 
 	g_signal_connect(G_OBJECT(gtkblist->window), "show",
 					 G_CALLBACK(blist_show_cb), NULL);
 
-	if (purple_prefs_get_bool(pref_blist_autohide) && (gboolean)data == TRUE) {
+	if (purple_prefs_get_bool(pref_blist_autohide) && GPOINTER_TO_INT(data) == TRUE) {
 		gtk_widget_hide(gtkblist->window);
 		logging_in = TRUE;
 	}
@@ -277,13 +277,13 @@ connect_callback(PurplePlugin *plugin, const char *pref, PurplePrefCallback func
 // Callback showing the tooltip and tooltip reveal time
 static void
 blist_tooltip_update(const char *name, PurplePrefType type, gconstpointer value, gpointer data) {
-	GtkWidget *widget = data;
-	GList *spin_button;
+	GtkContainer *widget = data;
+	GtkSpinButton *spin_button;
 	gint reveal_delay;
 
 	if (purple_prefs_get_bool(name)) {	
 		spin_button = g_list_last(gtk_container_get_children(widget))->data;
-		reveal_delay = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spin_button));
+		reveal_delay = gtk_spin_button_get_value_as_int(spin_button);
 		purple_prefs_set_int(pref_tooltip_delay, reveal_delay);
 		gtk_spin_button_set_value(spin_button, reveal_delay);
 		gtk_widget_set_sensitive(GTK_WIDGET(widget), TRUE);
@@ -353,10 +353,10 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 	tab_label1 = gtk_label_new("General");
 	tab_label2 = gtk_label_new("Accels");
 	page2 = gtk_vbox_new(FALSE, 18);
-	gtk_notebook_append_page(nb, ret, tab_label1);
-	gtk_notebook_append_page(nb, page2, tab_label2);
+	gtk_notebook_append_page(GTK_NOTEBOOK(nb), ret, tab_label1);
+	gtk_notebook_append_page(GTK_NOTEBOOK(nb), page2, tab_label2);
 
-	gtk_container_set_border_width (GTK_CONTAINER (ret), 12);
+	gtk_container_set_border_width (GTK_CONTAINER(ret), 12);
 	gtk_container_set_border_width (GTK_CONTAINER(page2), 12);
 
 	vbox = pidgin_make_frame (ret, "Interface Font Sizes (points)");
@@ -405,7 +405,7 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 
 	/* Tooltip Delay */
 	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(vbox, hbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	pidgin_prefs_checkbox("Show buddy _tooltip:", pref_blist_tooltip, hbox);
 	reveal_delay_widget = pidgin_prefs_labeled_spin_button(hbox, "Reveal delay (ms):",
 										pref_tooltip_delay,
