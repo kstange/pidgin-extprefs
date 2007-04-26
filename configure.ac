@@ -101,5 +101,13 @@ echo Configuration complete
 echo;
 echo Debugging enabled..............: $enable_debug
 echo;
-echo Type make to compile
+eval eval echo Extended Preferences will be installed in $libdir.
+if eval eval test ! -e ${bindir}/pidgin ; then
+	echo;
+        echo "Warning: Pidgin is not installed in $prefix.  Plugin may not"
+        echo "         be installed to a loadable location."
+fi
+
+echo;
+echo configure complete, now type \'make\' to compile
 echo;

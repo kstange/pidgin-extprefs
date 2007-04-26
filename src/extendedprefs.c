@@ -304,6 +304,10 @@ plugin_load(PurplePlugin *plugin) {
 	connect_callback(plugin, pref_blist_taskbar,      (PurplePrefCallback)blist_taskbar_update);
 	connect_callback(plugin, pref_blist_allow_shrink, (PurplePrefCallback)blist_shrink_update);
 
+	/* Make sure our "enabled" pref is in sync with the tooltip's delay. */
+	purple_prefs_set_bool(pref_blist_tooltip,
+		(purple_prefs_get_int(pref_tooltip_delay) > 0));
+
 	return TRUE;
 }
 
@@ -478,7 +482,6 @@ init_plugin(PurplePlugin *plugin)
 {
 	purple_prefs_add_none("/plugins/gtk/kstange");
 	purple_prefs_add_none("/plugins/gtk/kstange/extendedprefs");
-	purple_prefs_add_none("/plugins/gtk/kstange/extendedprefs/conv_buttons");
 	purple_prefs_add_bool(pref_conv_show_joinpart, TRUE);
 	purple_prefs_add_int(pref_conv_size, 8);
 	purple_prefs_add_int(pref_popup_size, 8);
