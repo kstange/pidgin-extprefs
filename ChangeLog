@@ -1,8 +1,13 @@
 Pidgin Extended Preferences Plugin
 
 Version 0.7:
+	* This version is fully compatible with the Pidgin name and API
+	  change. It will no longer compile or load with any version
+	  branded as "Gaim."
 	* Changed the tooltip preference to include an on/off checkbox
 	  to make it clearer how to disable the tooltip.
+	* "Hide Buddy List at Signon" is now "Hide Buddy List at Startup"
+	  and should behave very predictably with no blinking windows!
 
 Version 0.6 (03/22/2007):
 	* Gaim 1.x.y compatibility has been removed from the plugin. Gaim
