@@ -52,7 +52,7 @@ static const char *pref_conv_zoom        = "/plugins/gtk/kstange/extendedprefs/c
 
 static const char *pref_blist_taskbar    = "/plugins/gtk/kstange/extendedprefs/blist_taskbar";
 
-static const char *pref_tooltip_delay    = "/gaim/gtk/blist/tooltip_delay";
+static const char *pref_tooltip_delay    = "/pidgin/blist/tooltip_delay";
 
 static const char *pref_conv_show_joinpart = "/plugins/gtk/kstange/extendedprefs/conv_show_joinpart";
 static const char *pref_popup_size       = "/plugins/gtk/kstange/extendedprefs/popup_size";
