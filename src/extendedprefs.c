@@ -488,7 +488,7 @@ init_plugin(PurplePlugin *plugin)
 	purple_prefs_add_bool(pref_blist_allow_shrink, FALSE);
 	purple_prefs_add_bool(pref_blist_autohide, FALSE);
 	purple_prefs_add_bool(pref_blist_tooltip, TRUE);
-	
+
 	if (purple_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * purple_prefs_get_int(pref_conv_zoom);
 		purple_prefs_set_int(pref_conv_size,  floor(zoom));
