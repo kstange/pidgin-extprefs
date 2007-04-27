@@ -264,9 +264,9 @@ blist_tooltip_update(const char *name, PurplePrefType type, gconstpointer value,
 }
 
 static void
-delete_prefs(GtkWidget *widget, void *plugin) {
+delete_prefs(GtkWidget *widget, void *data) {
 	/* Unregister callbacks. */
-	purple_prefs_disconnect_by_handle(plugin);
+	purple_prefs_disconnect_by_handle(widget);
 }
 
 static gboolean
@@ -338,6 +338,9 @@ plugin_unload(PurplePlugin *plugin) {
 	/* Reset all fonts back to standard sizes. */
 	size_prefs_clear_all();
 
+	/* Disconnect all the prefs callbacks */
+	purple_prefs_disconnect_by_handle(plugin);
+
 	return TRUE;
 }
 
@@ -354,7 +357,7 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 
 	/* If this frame is destroyed, clean up after it. */
         g_signal_connect(G_OBJECT(ret), "destroy",
-                                         G_CALLBACK(delete_prefs), plugin);
+                                         G_CALLBACK(delete_prefs), NULL);
 
 	/* Create a notebook tab for the General prefs */
 	page = gtk_vbox_new(FALSE, 18);
@@ -416,7 +419,7 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 										KSTANGE_EP_BLIST_TIP_MAX,
 										NULL);
 	gtk_widget_set_sensitive(GTK_WIDGET(spin), purple_prefs_get_bool(pref_blist_tooltip));
-	purple_prefs_connect_callback(plugin, pref_blist_tooltip,
+	purple_prefs_connect_callback(ret, pref_blist_tooltip,
 									blist_tooltip_update, spin);
 
 	/* Window Widget Tweaking Prefs */
