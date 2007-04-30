@@ -18,11 +18,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-EP_TOP   =		../
+EP_TOP   =		..
 PIDGIN_TREE_TOP =	../../../..
 
 EP = extprefs
-EP_VERSION = $(shell cat ${EP_TOP}/VERSION)
+
+EP_VERSION = $(shell grep "^EXTPREFS_VERSION=" $(EP_TOP)/configure.ac | sed 's/.*"\(.*\)"/\1/' )
 
 CFLAGS =
 
