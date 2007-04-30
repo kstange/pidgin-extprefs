@@ -1,8 +1,16 @@
 Pidgin Extended Preferences Plugin
 
-Version 0.7
+Version 0.7 (04/29/2007):
 
+   There's not much changed in this version, but a lot has changed, so
+   it's needed.  Gaim is now Pidgin, and so we are now the Pidgin Extended
+   Preferences Plugin.  As a result, the plugin has been recoded for the
+   new name and API.  Craig has also changed the way the tooltips pref
+   works so that it is a bit clearer, and I've fixed the "Hide buddy list
+   at startup" pref so that it should really always work.  Other than that,
+   we're just releasing so that we're ready for Pidgin 2.0.0 beta 7.
 
+   There should be more new features in the next release, hopefully!
 
 Version 0.6 (03/22/2007):
 

@@ -6,7 +6,7 @@
 AC_INIT(src/extendedprefs.c)
 AC_PREREQ([2.50])
 
-EXTPREFS_VERSION="0.7cvs"
+EXTPREFS_VERSION="0.7"
 AM_INIT_AUTOMAKE([pidgin-extprefs], $EXTPREFS_VERSION, 'no-define')
 AC_DEFINE_UNQUOTED(EXTPREFS_VERSION, "$EXTPREFS_VERSION", [pidgin-extprefs Version])
 
