@@ -25,7 +25,7 @@ BIN_DIST =	ChangeLog \
 		LICENSE \
 		TODO
 
-VERSION = $(shell cat ./VERSION)
+VERSION = $(shell grep "^EXTPREFS_VERSION=" configure.ac | sed 's/.*"\(.*\)"/\1/' )
 
 all:
 	$(MAKE) -C $(EP_SRC) -f Makefile.mingw

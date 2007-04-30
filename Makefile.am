@@ -5,10 +5,11 @@ EXTRA_DIST =                 \
 	LICENSE              \
 	Makefile.mingw       \
 	TODO                 \
-	VERSION              \
 	src/Makefile.mingw
 
 SUBDIRS = src
+
+DISTCLEANFILES = extprefs_config.h
 
 BUILT_SOURCES = extprefs_config.h
 
