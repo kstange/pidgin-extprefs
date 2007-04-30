@@ -32,25 +32,13 @@ directory, which is usually used for building packages by typing:
 
 	make -f Makefile.mingw install
 
+To make a distributable zip file, run:
+
+	make -f Makefile.mingw zip
+
 If you'd rather just use the plugin with your regular Pidgin installation,
 copy the extprefs.dll file from the src/ subdirectory to your user plugins
-directory:
-
-	Windows 98/Me:
-	c:\windows\Application Data\.pidgin\plugins (default user)
-	c:\windows\profiles\<username>\Application Data\.pidgin\plugins
-
-	Windows NT 4.0:
-	c:\winnt\profiles\<username>\Application Data\.pidgin\plugins
-
-	Windows 2000/XP/2003:
-	c:\documents and settings\<username>\Application Data\.pidgin\plugins
-
-	Windows Vista:
-	C:\Users\<username>\AppData\Roaming\.pidgin\plugins
-
-Then simply start or restart Pidgin and load the plugin from the Pidgin
-preferences dialog.
+directory.  For further details, please see INSTALL-win32.txt.
 
 Non-Windows Installation
 ========================
