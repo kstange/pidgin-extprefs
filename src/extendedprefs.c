@@ -48,6 +48,8 @@
 #define KSTANGE_EP_BLIST_TIP_MIN 0
 #define KSTANGE_EP_BLIST_TIP_STD 500
 #define KSTANGE_EP_BLIST_TIP_MAX 7000
+#define KSTANGE_EP_BLIST_BLIST_VS_MIN 0
+#define KSTANGE_EP_BLIST_BLIST_VS_MAX 5
 
 static const char *pref_conv_zoom        = "/plugins/gtk/kstange/extendedprefs/conv_zoom";
 
@@ -64,6 +66,8 @@ static const char *pref_blist_size       = "/plugins/gtk/kstange/extendedprefs/b
 static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs/blist_allow_shrink";
 static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
 static const char *pref_blist_tooltip		= "/plugins/gtk/kstange/extendedprefs/blist_tooltip";
+static const char *pref_blist_vspace		= "/plugins/gtk/kstange/extendedprefs/blist_vspace";
+
 
 static gdouble _point_sizes [] = { .69444444, .8333333, 1, 1.2, 1.44, 1.728, 2.0736};
 
@@ -208,9 +212,10 @@ blist_taskbar_update(const char *pref, PurplePrefType type, gpointer value,
 
 		if (!GTK_IS_WINDOW(gtkblist->window))
 			return;
-
+		purple_debug_info(NULL, "!GPOINTER_TO_INT(value): %d\n", !GPOINTER_TO_INT(value));
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(gtkblist->window),
 										 !GPOINTER_TO_INT(value));
+
 	}
 }
 
@@ -261,6 +266,43 @@ blist_tooltip_update(const char *name, PurplePrefType type, gconstpointer value,
 		gtk_widget_set_sensitive(hbox, FALSE);
 		gtk_spin_button_set_value(spin, KSTANGE_EP_BLIST_TIP_MIN);
 	}
+}
+
+/* Set up the style for .purple/gtkrc-2.0 */
+static GString*
+blist_treeview_style(int value) {
+
+	GString *style = g_string_new("");
+	g_string_append(style, "style \"blist-vspace-style\" {\n");
+	g_string_append_printf(style, "GtkTreeView::vertical-separator=%d\n", value);
+	g_string_append(style, "\n} widget \"*pidgin_blist_treeview\" style \"blist-vspace-style\""); 
+	return style;
+}
+
+/* Callback for changing buddy vertical spacing.
+ *
+ * Using code ideas for style and applying style to blist from Etan Reisner <deryni@eden.rutgers.edu> GTK+ Theme Control Plugin
+ *
+ * */
+static void
+blist_vspace_cb(const char *name, PurplePrefType type, gconstpointer value, gpointer data) {
+	GtkWidget *hbox = data;
+	GtkSpinButton *spin = g_list_last(gtk_container_get_children(GTK_CONTAINER(hbox)))->data;		
+	const GString *style;
+	GtkSettings *setting = NULL;
+
+	int spin_value = (int)gtk_spin_button_get_value(spin);
+	style = blist_treeview_style(spin_value);
+	gtk_rc_parse_string(style->str);
+
+#if GTK_CHECK_VERSION(2,4,0)
+   setting = gtk_settings_get_default();
+	gtk_rc_reset_styles(setting);
+#endif
+
+	 purple_prefs_set_int(pref_blist_vspace, spin_value);	
+	 purple_debug_info(NULL, "pref_blist_vspace value: %d\n", purple_prefs_get_int(pref_blist_vspace));
+
 }
 
 static void
@@ -431,6 +473,15 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 
 	pidgin_prefs_checkbox("Allow buddy list to s_hrink below normal size constraints",
 							pref_blist_allow_shrink, vbox);
+	
+	/* Buddy vertical spacing in the buddy list */
+	spin = pidgin_prefs_labeled_spin_button(vbox, "Buddy vertical spacing:",
+							pref_blist_vspace, 
+							KSTANGE_EP_BLIST_BLIST_VS_MIN, 
+							KSTANGE_EP_BLIST_BLIST_VS_MAX, 
+							NULL);
+	purple_prefs_connect_callback(ret, pref_blist_vspace,
+							blist_vspace_cb, spin);
 
 #if 0
 	/* Create a notebook tab for the Accels editor */
@@ -494,6 +545,7 @@ init_plugin(PurplePlugin *plugin)
 	purple_prefs_add_bool(pref_blist_allow_shrink, FALSE);
 	purple_prefs_add_bool(pref_blist_autohide, FALSE);
 	purple_prefs_add_bool(pref_blist_tooltip, TRUE);
+	purple_prefs_add_int(pref_blist_vspace, 2);
 
 	if (purple_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * purple_prefs_get_int(pref_conv_zoom);
