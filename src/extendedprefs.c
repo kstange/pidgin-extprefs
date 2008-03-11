@@ -67,6 +67,7 @@ static const char *pref_blist_allow_shrink	= "/plugins/gtk/kstange/extendedprefs
 static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/blist_autohide";
 static const char *pref_blist_tooltip		= "/plugins/gtk/kstange/extendedprefs/blist_tooltip";
 static const char *pref_blist_vspace		= "/plugins/gtk/kstange/extendedprefs/blist_vspace";
+static const char *pref_blist_group_tooltip = "/plugins/gtk/kstange/extendedprefs/blist_group_tooltip";
 
 
 static gdouble _point_sizes [] = { .69444444, .8333333, 1, 1.2, 1.44, 1.728, 2.0736};
@@ -305,6 +306,13 @@ blist_vspace_cb(const char *name, PurplePrefType type, gconstpointer value, gpoi
 
 }
 
+/* Hides/destroys the group tooltip */
+static void
+group_tooltip_cb (PurpleBlistNode *node, GString *text, gboolean full) {
+	if (purple_prefs_get_bool(pref_blist_group_tooltip)) 
+		 if (PURPLE_BLIST_NODE_IS_GROUP(node)) pidgin_blist_tooltip_destroy();
+}
+
 static void
 delete_prefs(GtkWidget *widget, void *data) {
 	/* Unregister callbacks. */
@@ -334,6 +342,9 @@ plugin_load(PurplePlugin *plugin) {
 	purple_signal_connect(purple_conversations_get_handle(), "chat-buddy-joining", plugin, PURPLE_CALLBACK(chat_join_part_cb), NULL);
 	purple_signal_connect(purple_conversations_get_handle(), "chat-buddy-leaving", plugin, PURPLE_CALLBACK(chat_join_part_cb), NULL);
 
+	/* Callback for group tooltips */
+	purple_signal_connect(pidgin_blist_get_handle(), "drawing-tooltip", plugin, PURPLE_CALLBACK(group_tooltip_cb), NULL);
+	
 	/* Initialize all font size prefs. */
 	size_prefs_init_all();
 
@@ -387,7 +398,7 @@ plugin_unload(PurplePlugin *plugin) {
 }
 
 static GtkWidget* get_config_frame(PurplePlugin *plugin) {
-	GtkWidget *ret, *nb, *hbox, *spin, *page;
+	GtkWidget *ret, *nb, *hbox, *spin, *page, *cb;
 	GtkWidget *vbox;
 	GtkWidget *label;
 	GtkSizeGroup *sg;
@@ -483,6 +494,12 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 	purple_prefs_connect_callback(ret, pref_blist_vspace,
 							blist_vspace_cb, spin);
 
+	/* Group tooltip */
+	cb = pidgin_prefs_checkbox("Hide group tooltips",
+							pref_blist_group_tooltip, vbox);
+	purple_prefs_connect_callback(ret, pref_blist_group_tooltip, 
+							group_tooltip_cb, cb);
+		
 #if 0
 	/* Create a notebook tab for the Accels editor */
 	page = gtk_vbox_new(FALSE, 18);
@@ -546,6 +563,8 @@ init_plugin(PurplePlugin *plugin)
 	purple_prefs_add_bool(pref_blist_autohide, FALSE);
 	purple_prefs_add_bool(pref_blist_tooltip, TRUE);
 	purple_prefs_add_int(pref_blist_vspace, 2);
+	purple_prefs_add_bool(pref_blist_group_tooltip, FALSE);
+
 
 	if (purple_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * purple_prefs_get_int(pref_conv_zoom);
