@@ -68,7 +68,7 @@ static const char *pref_blist_autohide   = "/plugins/gtk/kstange/extendedprefs/b
 static const char *pref_blist_tooltip		= "/plugins/gtk/kstange/extendedprefs/blist_tooltip";
 static const char *pref_blist_vspace		= "/plugins/gtk/kstange/extendedprefs/blist_vspace";
 static const char *pref_blist_group_tooltip = "/plugins/gtk/kstange/extendedprefs/blist_group_tooltip";
-
+static const char *pref_conv_typing_not	= "/plugins/gtk/kstange/extendedprefs/conv_typing_not";
 
 static gdouble _point_sizes [] = { .69444444, .8333333, 1, 1.2, 1.44, 1.728, 2.0736};
 
@@ -269,7 +269,7 @@ blist_tooltip_update(const char *name, PurplePrefType type, gconstpointer value,
 	}
 }
 
-/* Set up the style for .purple/gtkrc-2.0 */
+/* Set up the style for .purple/gtkrc-2.0 for buddy vertical spacing */
 static GString*
 blist_treeview_style(int value) {
 
@@ -303,6 +303,39 @@ blist_vspace_cb(const char *name, PurplePrefType type, gconstpointer value, gpoi
 
 	 purple_prefs_set_int(pref_blist_vspace, spin_value);	
 	 purple_debug_info(NULL, "pref_blist_vspace value: %d\n", purple_prefs_get_int(pref_blist_vspace));
+
+}
+
+/* Hides the converstaion window buddy typing notification */
+static void
+conv_typing_not_cb (const char *pref, PurplePrefType type, gpointer val, gpointer user_data) {
+	GList *ims;
+	GList *conv;
+
+#define RESERVE_LINE	"";
+
+	 for (conv = purple_get_ims(); conv != NULL; conv = conv->next) {
+		if (conv != NULL) {
+			PidginConversation *gtkconv = PIDGIN_CONVERSATION((PurpleConversation *)conv->data);
+
+			if (gtkconv == NULL) return;
+
+			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(gtkconv->imhtml));
+			GtkTextTagTable *tagtable = gtk_text_buffer_get_tag_table(buffer);
+			gtk_text_tag_table_foreach(tagtable, (GtkTextTagTableForeach)tt_foreach, NULL);
+
+			GtkTextTag *tag = gtk_text_tag_table_lookup(tagtable, "TYPING-NOTIFICATION");
+			if (purple_prefs_get_bool(pref_conv_typing_not)) {
+				g_object_set(G_OBJECT(tag), "scale", 0.01, NULL);
+				g_object_set(G_OBJECT(tag), "invisible", TRUE, NULL);
+			}
+			else {
+				g_object_set(G_OBJECT(tag), "scale", 1.0, NULL);
+				g_object_set(G_OBJECT(tag), "invisible", FALSE, NULL);
+			}
+
+		}
+	}
 
 }
 
@@ -342,6 +375,7 @@ plugin_load(PurplePlugin *plugin) {
 	purple_signal_connect(purple_conversations_get_handle(), "chat-buddy-joining", plugin, PURPLE_CALLBACK(chat_join_part_cb), NULL);
 	purple_signal_connect(purple_conversations_get_handle(), "chat-buddy-leaving", plugin, PURPLE_CALLBACK(chat_join_part_cb), NULL);
 
+	purple_signal_connect(purple_conversations_get_handle(), "buddy-typing", plugin, PURPLE_CALLBACK(conv_typing_not_cb), NULL);
 	/* Callback for group tooltips */
 	purple_signal_connect(pidgin_blist_get_handle(), "drawing-tooltip", plugin, PURPLE_CALLBACK(group_tooltip_cb), NULL);
 	
@@ -360,6 +394,11 @@ plugin_load(PurplePlugin *plugin) {
 	/* Make sure our "enabled" pref is in sync with the tooltip's delay. */
 	purple_prefs_set_bool(pref_blist_tooltip,
 		(purple_prefs_get_int(pref_tooltip_delay) > 0));
+
+	/* If enabled, make sure we set up the callback to handle it */
+	if (purple_prefs_get_bool(pref_conv_typing_not)) {
+		purple_signal_connect(purple_conversations_get_handle(), "buddy-typing", plugin, PURPLE_CALLBACK(conv_typing_not_cb), NULL);
+	}
 
 	return TRUE;
 }
@@ -460,6 +499,11 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 	pidgin_prefs_checkbox("Show _join and part messages in chats",
 							pref_conv_show_joinpart, vbox);
 
+	/* Hide conversation window typing notification */
+	cb = pidgin_prefs_checkbox("Hide conversation window typing notification",
+	 						pref_conv_typing_not, vbox);
+ 	purple_prefs_connect_callback(ret, pref_conv_typing_not,
+									 (PurplePrefCallback)conv_typing_not_cb, cb);
 	vbox = pidgin_make_frame (page, "Buddy List");
 
 	/* Tooltip Delay */
@@ -564,7 +608,7 @@ init_plugin(PurplePlugin *plugin)
 	purple_prefs_add_bool(pref_blist_tooltip, TRUE);
 	purple_prefs_add_int(pref_blist_vspace, 2);
 	purple_prefs_add_bool(pref_blist_group_tooltip, FALSE);
-
+	purple_prefs_add_bool(pref_conv_typing_not, FALSE);
 
 	if (purple_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * purple_prefs_get_int(pref_conv_zoom);
