@@ -236,10 +236,51 @@ blist_shrink_update(const char *pref, PurplePrefType type, gpointer value,
 	}
 }
 
+/* Set up the style for buddy vertical spacing */
+static GString*
+blist_treeview_style(int value) {
+
+	GString *style = g_string_new("");
+	g_string_append(style, "style \"blist-vspace-style\" {\n");
+	g_string_append_printf(style, "GtkTreeView::vertical-separator=%d\n", value);
+	g_string_append(style, "\n} widget \"*pidgin_blist_treeview\" style \"blist-vspace-style\""); 
+	return style;
+}
+
+/* Update buddy vertical spacing
+ * 
+ * Using code ideas for style and applying style to 
+ * blist from Etan Reisner <deryni@eden.rutgers.edu> GTK+ Theme Control Plugin
+*/
+ static void
+blist_vspace_update(const char *name, PurplePrefType type, gconstpointer value, gpointer data) {
+	const GString *style;
+	GtkSettings *setting = NULL;
+	int spin_value;
+
+	if (data != NULL) {
+		GtkWidget *hbox = data;
+		GtkSpinButton *spin = g_list_last(gtk_container_get_children(GTK_CONTAINER(hbox)))->data;		
+		spin_value = (int)gtk_spin_button_get_value(spin);
+	}
+	else spin_value = GPOINTER_TO_INT(value);
+	style = blist_treeview_style(spin_value);
+	gtk_rc_parse_string(style->str);
+
+#if GTK_CHECK_VERSION(2,4,0)
+   setting = gtk_settings_get_default();
+	gtk_rc_reset_styles(setting);
+#endif
+
+	 purple_prefs_set_int(pref_blist_vspace, spin_value);	
+
+}
+
 static void
 blist_created_cb(PurpleBuddyList *blist, void *data) {
 	blist_taskbar_update(NULL, 0, GINT_TO_POINTER(purple_prefs_get_bool(pref_blist_taskbar)), NULL);
 	blist_shrink_update(NULL, 0, GINT_TO_POINTER(purple_prefs_get_bool(pref_blist_allow_shrink)), NULL);
+	blist_vspace_update(NULL, 0, GINT_TO_POINTER(purple_prefs_get_int(pref_blist_vspace)), NULL);
 }
 
 static gboolean
@@ -268,41 +309,6 @@ blist_tooltip_update(const char *name, PurplePrefType type, gconstpointer value,
 	}
 }
 
-/* Set up the style for .purple/gtkrc-2.0 for buddy vertical spacing */
-static GString*
-blist_treeview_style(int value) {
-
-	GString *style = g_string_new("");
-	g_string_append(style, "style \"blist-vspace-style\" {\n");
-	g_string_append_printf(style, "GtkTreeView::vertical-separator=%d\n", value);
-	g_string_append(style, "\n} widget \"*pidgin_blist_treeview\" style \"blist-vspace-style\""); 
-	return style;
-}
-
-/* Callback for changing buddy vertical spacing.
- *
- * Using code ideas for style and applying style to blist from Etan Reisner <deryni@eden.rutgers.edu> GTK+ Theme Control Plugin
- *
- * */
-static void
-blist_vspace_cb(const char *name, PurplePrefType type, gconstpointer value, gpointer data) {
-	GtkWidget *hbox = data;
-	GtkSpinButton *spin = g_list_last(gtk_container_get_children(GTK_CONTAINER(hbox)))->data;		
-	const GString *style;
-	GtkSettings *setting = NULL;
-
-	int spin_value = (int)gtk_spin_button_get_value(spin);
-	style = blist_treeview_style(spin_value);
-	gtk_rc_parse_string(style->str);
-
-#if GTK_CHECK_VERSION(2,4,0)
-   setting = gtk_settings_get_default();
-	gtk_rc_reset_styles(setting);
-#endif
-
-	 purple_prefs_set_int(pref_blist_vspace, spin_value);	
-
-}
 
 /* Hides the converstaion window buddy typing notification */
 static void
@@ -423,6 +429,16 @@ plugin_unload(PurplePlugin *plugin) {
 		purple_prefs_set_bool(pref_blist_visible, visible);
 	}
 
+
+	/* Reset GtkTreeView vertical-separator back to default value */
+	GString *style = blist_treeview_style(2);
+	gtk_rc_parse_string(style->str);
+
+#if GTK_CHECK_VERSION(2,4,0)
+   GtkSettings *setting = gtk_settings_get_default();
+	gtk_rc_reset_styles(setting);
+#endif
+
 	/* Reset all fonts back to standard sizes. */
 	size_prefs_clear_all();
 
@@ -532,7 +548,7 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 							KSTANGE_EP_BLIST_BLIST_VS_MAX, 
 							NULL);
 	purple_prefs_connect_callback(ret, pref_blist_vspace,
-							blist_vspace_cb, spin);
+							blist_vspace_update, spin);
 
 	/* Group tooltip */
 	cb = pidgin_prefs_checkbox("Hide group tooltips",
