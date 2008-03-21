@@ -213,7 +213,6 @@ blist_taskbar_update(const char *pref, PurplePrefType type, gpointer value,
 
 		if (!GTK_IS_WINDOW(gtkblist->window))
 			return;
-		purple_debug_info(NULL, "!GPOINTER_TO_INT(value): %d\n", !GPOINTER_TO_INT(value));
 		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(gtkblist->window),
 										 !GPOINTER_TO_INT(value));
 
@@ -302,14 +301,12 @@ blist_vspace_cb(const char *name, PurplePrefType type, gconstpointer value, gpoi
 #endif
 
 	 purple_prefs_set_int(pref_blist_vspace, spin_value);	
-	 purple_debug_info(NULL, "pref_blist_vspace value: %d\n", purple_prefs_get_int(pref_blist_vspace));
 
 }
 
 /* Hides the converstaion window buddy typing notification */
 static void
 conv_typing_not_cb (const char *pref, PurplePrefType type, gpointer val, gpointer user_data) {
-	GList *ims;
 	GList *conv;
 
 #define RESERVE_LINE	"";
@@ -322,7 +319,6 @@ conv_typing_not_cb (const char *pref, PurplePrefType type, gpointer val, gpointe
 
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(gtkconv->imhtml));
 			GtkTextTagTable *tagtable = gtk_text_buffer_get_tag_table(buffer);
-			gtk_text_tag_table_foreach(tagtable, (GtkTextTagTableForeach)tt_foreach, NULL);
 
 			GtkTextTag *tag = gtk_text_tag_table_lookup(tagtable, "TYPING-NOTIFICATION");
 			if (purple_prefs_get_bool(pref_conv_typing_not)) {
@@ -542,7 +538,7 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 	cb = pidgin_prefs_checkbox("Hide group tooltips",
 							pref_blist_group_tooltip, vbox);
 	purple_prefs_connect_callback(ret, pref_blist_group_tooltip, 
-							group_tooltip_cb, cb);
+							(PurplePrefCallback)group_tooltip_cb, cb);
 		
 #if 0
 	/* Create a notebook tab for the Accels editor */
