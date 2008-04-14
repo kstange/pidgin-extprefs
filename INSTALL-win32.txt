@@ -15,7 +15,7 @@ the extprefs.dll file from the zip file to your Pidgin user plugins folder:
 	c:\documents and settings\<username>\Application Data\.purple\plugins
 
 	Windows Vista: 
-	C:\Users\<username>\AppData\Roaming\.purple\plugins
+	C:\Program Files\<username>\AppData\Roaming\.purple\plugins
 
 The "plugins" folder will not exist unless you have previously installed a
 3rd party plugin there.  You should create this folder on your own and place
