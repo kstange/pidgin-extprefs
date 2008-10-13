@@ -40,6 +40,7 @@
 #include "gtkplugin.h"
 #include "gtkprefs.h"
 #include "gtkutils.h"
+#include "debug.h"
 
 #define KSTANGE_EP_PLUGIN_ID     "gtk-kstange-extendedprefs"
 
@@ -50,6 +51,7 @@
 #define KSTANGE_EP_BLIST_TIP_MAX 7000
 #define KSTANGE_EP_BLIST_BLIST_VS_MIN 0
 #define KSTANGE_EP_BLIST_BLIST_VS_MAX 5
+#define KSTANGE_EP_BLIST_DEFAULT_EXPANDER 12
 
 static const char *pref_conv_zoom        = "/plugins/gtk/kstange/extendedprefs/conv_zoom";
 
@@ -69,6 +71,7 @@ static const char *pref_blist_tooltip		= "/plugins/gtk/kstange/extendedprefs/bli
 static const char *pref_blist_vspace		= "/plugins/gtk/kstange/extendedprefs/blist_vspace";
 static const char *pref_blist_group_tooltip = "/plugins/gtk/kstange/extendedprefs/blist_group_tooltip";
 static const char *pref_conv_typing_not	= "/plugins/gtk/kstange/extendedprefs/conv_typing_not";
+static const char *pref_blist_expander		= "/plugins/gtk/kstange/extendedprefs/blist_expander";
 
 static gdouble _point_sizes [] = { .69444444, .8333333, 1, 1.2, 1.44, 1.728, 2.0736};
 
@@ -137,6 +140,26 @@ reset_theme() {
 		}
 	}
 }
+
+/* Creates a gtkrc style to use for set_style */
+static GString*
+create_style(const char* name, const char* stylename, int value, const char* widgetname) {
+	GString *style = g_string_new("");
+	g_string_append_printf(style, "style \"%s\" { %s=%d } widget \"%s\" style \"%s\"", name, stylename, value, widgetname, name);
+	return style;
+}
+
+static void
+set_style(GString *style) {
+	gtk_rc_parse_string(style->str);
+
+#if GTK_CHECK_VERSION(2,4,0)
+   GtkSettings *setting = gtk_settings_get_default();
+	gtk_rc_reset_styles(setting);
+#endif
+
+}
+
 
 static void
 size_prefs_init_all() {
@@ -252,7 +275,7 @@ blist_treeview_style(int value) {
  * Using code ideas for style and applying style to 
  * blist from Etan Reisner <deryni@eden.rutgers.edu> GTK+ Theme Control Plugin
 */
- static void
+static void
 blist_vspace_update(const char *name, PurplePrefType type, gconstpointer value, gpointer data) {
 	const GString *style;
 	GtkSettings *setting = NULL;
@@ -274,6 +297,25 @@ blist_vspace_update(const char *name, PurplePrefType type, gconstpointer value, 
 
 	 purple_prefs_set_int(pref_blist_vspace, spin_value);	
 
+}
+
+/* Update the expander size in the buddy list */
+static void
+blist_expander_update(const char *name, PurplePrefType type, gconstpointer value, gpointer data) {
+	GString *style = g_string_new("");
+	GtkSettings *setting = NULL;
+	int spin_value;
+
+	spin_value = purple_prefs_get_int(pref_blist_expander);
+	style = create_style("blist-expander-style", "GtkTreeView::expander-size", spin_value, "*pidgin_blist_treeview");
+	gtk_rc_parse_string(style->str);
+
+#if GTK_CHECK_VERSION(2,4,0)
+   setting = gtk_settings_get_default();
+	gtk_rc_reset_styles(setting);
+#endif
+
+	
 }
 
 static void
@@ -402,6 +444,12 @@ plugin_load(PurplePlugin *plugin) {
 		purple_signal_connect(purple_conversations_get_handle(), "buddy-typing", plugin, PURPLE_CALLBACK(conv_typing_not_cb), NULL);
 	}
 
+	/* Set the gtkrc settings upon loading */
+	int value = purple_prefs_get_int(pref_blist_expander);
+	GString* style = create_style("blist-expander-style", "GtkTreeView::expander-size", value, "*pidgin_blist_treeview");
+	set_style(style);
+
+
 	return TRUE;
 }
 
@@ -438,6 +486,13 @@ plugin_unload(PurplePlugin *plugin) {
    GtkSettings *setting = gtk_settings_get_default();
 	gtk_rc_reset_styles(setting);
 #endif
+	
+	/* Reset expander size back to default size (12) */
+	GString* style = create_style("blist-expander-style", 
+		"GtkTreeView::expander-size", 
+		KSTANGE_EP_BLIST_DEFAULT_EXPANDER, 
+		"*pidgin_blist_treeview");
+	set_style(style);
 
 	/* Reset all fonts back to standard sizes. */
 	size_prefs_clear_all();
@@ -550,6 +605,14 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 	purple_prefs_connect_callback(ret, pref_blist_vspace,
 							blist_vspace_update, spin);
 
+	spin = pidgin_prefs_labeled_spin_button(vbox, "Expander size:",
+							pref_blist_expander,
+							KSTANGE_EP_BLIST_BLIST_VS_MIN,
+							KSTANGE_EP_BLIST_BLIST_VS_MAX+10,
+							NULL);
+	purple_prefs_connect_callback(ret, pref_blist_expander,
+							blist_expander_update, spin);
+
 	/* Group tooltip */
 	cb = pidgin_prefs_checkbox("Hide group tooltips",
 							pref_blist_group_tooltip, vbox);
@@ -621,6 +684,7 @@ init_plugin(PurplePlugin *plugin)
 	purple_prefs_add_int(pref_blist_vspace, 2);
 	purple_prefs_add_bool(pref_blist_group_tooltip, FALSE);
 	purple_prefs_add_bool(pref_conv_typing_not, FALSE);
+	purple_prefs_add_int(pref_blist_expander, 12);
 
 	if (purple_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * purple_prefs_get_int(pref_conv_zoom);
