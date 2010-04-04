@@ -149,6 +149,7 @@ create_style(const char* name, const char* stylename, int value, const char* wid
 	return style;
 }
 
+/* Sets the gtkrc style */
 static void
 set_style(GString *style) {
 	gtk_rc_parse_string(style->str);
@@ -383,11 +384,20 @@ conv_typing_not_cb (const char *pref, PurplePrefType type, gpointer val, gpointe
 
 }
 
-/* Hides/destroys the group tooltip */
+/* Hides/destroys the group or buddy tooltip */
 static void
-group_tooltip_cb (PurpleBlistNode *node, GString *text, gboolean full) {
-	if (purple_prefs_get_bool(pref_blist_group_tooltip)) 
-		 if (PURPLE_BLIST_NODE_IS_GROUP(node)) pidgin_blist_tooltip_destroy();
+tooltip_cb (PurpleBlistNode *node, GString *text, gboolean full) {
+	purple_debug_info("Extended Prefs", "tooltip_cb: Drawing tool\n");
+	if (purple_prefs_get_bool(pref_blist_group_tooltip) && PURPLE_BLIST_NODE_IS_GROUP(node)) {
+		pidgin_blist_tooltip_destroy();
+	}
+	if (!purple_prefs_get_bool(pref_blist_tooltip) && PURPLE_BLIST_NODE_IS_BUDDY(node)) {
+		pidgin_blist_tooltip_destroy();
+	}
+}
+
+
+
 }
 
 static void
@@ -420,8 +430,12 @@ plugin_load(PurplePlugin *plugin) {
 	purple_signal_connect(purple_conversations_get_handle(), "chat-buddy-leaving", plugin, PURPLE_CALLBACK(chat_join_part_cb), NULL);
 
 	purple_signal_connect(purple_conversations_get_handle(), "buddy-typing", plugin, PURPLE_CALLBACK(conv_typing_not_cb), NULL);
-	/* Callback for group tooltips */
-	purple_signal_connect(pidgin_blist_get_handle(), "drawing-tooltip", plugin, PURPLE_CALLBACK(group_tooltip_cb), NULL);
+	/* Callback for group and buddy tooltips */
+	purple_signal_connect(pidgin_blist_get_handle(), "drawing-tooltip", plugin, PURPLE_CALLBACK(tooltip_cb), NULL);
+	/* Callback for dim_idle buddies */
+	purple_signal_connect(pidgin_blist_get_handle(), "buddy-idle-changed", plugin, PURPLE_CALLBACK(dim_idle_buddies_cb), NULL);
+	/* Callback for hiding status icons */
+	purple_signal_connect(pidgin_blist_get_handle(), "buddy-status-changed", plugin, PURPLE_CALLBACK(buddy_status_changed_cb), NULL);
 	
 	/* Initialize all font size prefs. */
 	size_prefs_init_all();
@@ -477,18 +491,12 @@ plugin_unload(PurplePlugin *plugin) {
 		purple_prefs_set_bool(pref_blist_visible, visible);
 	}
 
-
 	/* Reset GtkTreeView vertical-separator back to default value */
 	GString *style = blist_treeview_style(2);
-	gtk_rc_parse_string(style->str);
-
-#if GTK_CHECK_VERSION(2,4,0)
-   GtkSettings *setting = gtk_settings_get_default();
-	gtk_rc_reset_styles(setting);
-#endif
+	set_style(style);
 	
 	/* Reset expander size back to default size (12) */
-	GString* style = create_style("blist-expander-style", 
+	style = create_style("blist-expander-style", 
 		"GtkTreeView::expander-size", 
 		KSTANGE_EP_BLIST_DEFAULT_EXPANDER, 
 		"*pidgin_blist_treeview");
@@ -616,9 +624,6 @@ static GtkWidget* get_config_frame(PurplePlugin *plugin) {
 	/* Group tooltip */
 	cb = pidgin_prefs_checkbox("Hide group tooltips",
 							pref_blist_group_tooltip, vbox);
-	purple_prefs_connect_callback(ret, pref_blist_group_tooltip, 
-							(PurplePrefCallback)group_tooltip_cb, cb);
-		
 #if 0
 	/* Create a notebook tab for the Accels editor */
 	page = gtk_vbox_new(FALSE, 18);
@@ -684,7 +689,10 @@ init_plugin(PurplePlugin *plugin)
 	purple_prefs_add_int(pref_blist_vspace, 2);
 	purple_prefs_add_bool(pref_blist_group_tooltip, FALSE);
 	purple_prefs_add_bool(pref_conv_typing_not, FALSE);
-	purple_prefs_add_int(pref_blist_expander, 12);
+	purple_prefs_add_int(pref_blist_expander, KSTANGE_EP_BLIST_DEFAULT_EXPANDER);
+	purple_prefs_add_bool(pref_hide_status_icon, FALSE);
+	purple_prefs_add_int(pref_status_box_size, 8);
+	purple_prefs_add_bool(pref_dim_idle_buddies, TRUE);
 
 	if (purple_prefs_exists(pref_conv_zoom)) {
 		double zoom = 8 * 0.01 * purple_prefs_get_int(pref_conv_zoom);
